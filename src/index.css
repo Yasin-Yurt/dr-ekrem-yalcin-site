@@ -1,0 +1,427 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-gold: #D4AF37;
+  --color-navy-stitch: #112240;
+  --color-dark-stitch: #0a192f;
+  
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    height: auto;
+    min-height: 100%;
+  }
+
+  body {
+    @apply text-white font-sans antialiased;
+    /* Deep "Old Money" Rich Navy Gradient with a soft upward-radiating bottom glow */
+    background: 
+      radial-gradient(circle at 50% 100%, rgba(212, 175, 55, 0.15) 0%, transparent 70%),
+      radial-gradient(circle at 50% 0%, #1a2a4a 0%, #0f1c35 50%, #050a1a 100%);
+    background-attachment: fixed;
+    position: relative;
+    min-height: 100vh;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Premium Leather & Fine Stitch Texture with subtle light overlays */
+    background-image: 
+      url("https://www.transparenttextures.com/patterns/padded-leather.png"), 
+      radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(212, 175, 55, 0.1) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.04) 0%, transparent 60%);
+    background-size: 400px, cover, cover, cover, cover;
+    background-attachment: fixed;
+    opacity: 0.35; /* Increased texture visibility for better detail */
+    z-index: -1;
+    pointer-events: none;
+    transform: translateZ(0);
+    animation: backgroundShimmer 15s infinite alternate ease-in-out;
+  }
+
+  @keyframes backgroundShimmer {
+    0% { opacity: 0.08; }
+    50% { opacity: 0.12; }
+    100% { opacity: 0.08; }
+  }
+
+  @keyframes slowRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { 
+      filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.4));
+    }
+    50% { 
+      filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.9));
+    }
+  }
+
+  .animate-logo-dual {
+    animation: 
+      slowRotate 5s linear infinite,
+      pulseGlow 2s ease-in-out infinite;
+    transform-origin: center;
+    will-change: transform, filter;
+    @media (max-width: 768px) {
+      animation: slowRotate 8s linear infinite; /* Simplify on mobile */
+    }
+  }
+
+  /* Rotating Border Glow for Cards (Hardware Accelerated) */
+  @keyframes borderRotate {
+    from { transform: translate3d(-50%, -50%, 0) rotate(0deg); }
+    to { transform: translate3d(-50%, -50%, 0) rotate(360deg); }
+  }
+
+  .rotating-border-glow {
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 35px rgba(212, 175, 55, 0.08);
+    transition: border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+    transform-style: preserve-3d;
+  }
+
+  /* Separate hover transition restricted to devices supporting hover (Desktop/Mice) to prevent scroll jank on mobile */
+  @media (hover: hover) {
+    .rotating-border-glow {
+      transition: box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.5s ease;
+    }
+    .rotating-border-glow:hover {
+      box-shadow: 0 0 55px rgba(212, 175, 55, 0.2);
+    }
+  }
+
+  .rotating-border-glow::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 180%;
+    height: 180%;
+    /* Pre-feathered conic gradient reduces the need for high filter blur, saving significant GPU cycles */
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      transparent 120deg,
+      rgba(212, 175, 55, 0.01) 140deg,
+      rgba(212, 175, 55, 0.15) 160deg,
+      rgba(212, 175, 55, 0.45) 180deg,
+      rgba(212, 175, 55, 0.15) 200deg,
+      rgba(212, 175, 55, 0.01) 220deg,
+      transparent 240deg,
+      transparent 360deg
+    );
+    animation: borderRotate var(--glow-duration, 12s) linear infinite;
+    animation-delay: var(--glow-delay, 0s);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.3;
+    filter: blur(4px); /* Lower blur radius is significantly lighter on GPU pixel shaders */
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+    transform: translate3d(-50%, -50%, 0) rotate(0.001deg);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+  }
+
+  .rotating-border-glow:hover::before {
+    opacity: 0.65;
+  }
+
+  /* Ensure card content stays above the rotating glow */
+  .rotating-border-glow > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Pulsing Headline Glow */
+  @keyframes headlinePulse {
+    0%, 100% { 
+      text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+      opacity: 0.9;
+    }
+    50% { 
+      text-shadow: 0 0 35px rgba(212, 175, 55, 0.6), 0 0 15px rgba(212, 175, 55, 0.3);
+      opacity: 1;
+    }
+  }
+
+  .pulsing-headline {
+    animation: headlinePulse 1.6s ease-in-out infinite;
+    display: inline-block;
+  }
+  
+  h1, h2, h3, h4 {
+    @apply font-serif;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* Yasin, senin o premium animasyonlarının ve class'larının tamamını buraya milimetrik kopyaladım */
+/* Bunların hiçbiri değişmedi, butonların ve HUD'un yerleri kaymayacak */
+
+/* Premium UI Utilities */
+.glass-card {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10;
+}
+
+.gold-border-card {
+  @apply bg-[#03071E] border border-gold/30 hover:border-gold transition-all duration-500;
+}
+
+.gold-gradient-bg {
+  background: linear-gradient(135deg, #D4AF37 0%, #F1D592 50%, #D4AF37 100%);
+}
+
+.premium-text-gradient {
+  background: linear-gradient(to bottom, #FFFFFF 0%, #F1D592 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-glow {
+  box-shadow: 0 0 50px rgba(212, 175, 55, 0.3), 0 0 100px rgba(212, 175, 55, 0.1);
+}
+
+.soft-glow-bg {
+  position: relative;
+}
+
+.soft-glow-bg::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150%;
+  height: 150%;
+  /* Sarılığı yumuşatmak için buradaki glow opaklığını `0.08`'e çektim (soft gold) */
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+.light-beam {
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, rgba(212, 175, 55, 0.2), transparent);
+  transform: rotate(45deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* BUTONLAR VE ANİMASYONLAR (HİÇBİR ŞEY DEĞİŞMEDİ) */
+.premium-button {
+  @apply rounded-full font-bold tracking-widest uppercase text-[10px] px-8 py-4 transition-all duration-500 flex items-center justify-center gap-3 overflow-hidden relative shadow-[0_10px_30px_rgba(212,175,55,0.3)];
+  background: linear-gradient(135deg, #D4AF37 0%, #F1D592 50%, #D4AF37 100%);
+  color: #050A30;
+}
+
+.premium-button:hover {
+  @apply -translate-y-1 scale-[1.05] shadow-[0_15px_45px_rgba(212,175,55,0.6)];
+  filter: brightness(1.15);
+}
+
+.instagram-button {
+  @apply rounded-full font-bold tracking-widest uppercase text-[10px] px-8 py-4 transition-all duration-500 flex items-center justify-center gap-3 overflow-hidden relative shadow-[0_10px_30px_rgba(225,48,108,0.2)];
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  color: white;
+}
+
+.instagram-button:hover {
+  @apply -translate-y-1 scale-[1.05] shadow-[0_15px_45px_rgba(225,48,108,0.5)];
+  filter: brightness(1.1);
+}
+
+.premium-button::after, .instagram-button::after {
+  content: "";
+  @apply absolute inset-0 opacity-0 transition-opacity duration-500;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.6), transparent);
+  transform: skewX(-20deg) translateX(-100%);
+}
+
+.premium-button:hover::after, .instagram-button:hover::after {
+  @apply opacity-100;
+  animation: shine 1.5s infinite;
+}
+
+@keyframes shine {
+  100% { transform: skewX(-20deg) translateX(200%); }
+}
+
+.play-icon-overlay {
+  @apply absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 backdrop-blur-[1px];
+}
+
+.play-icon-circle {
+  @apply w-16 h-16 rounded-full border-2 border-gold/50 flex items-center justify-center bg-gold/10 text-gold scale-75 group-hover:scale-100 transition-all duration-500 shadow-[0_0_30px_rgba(212,175,55,0.4)];
+}
+
+.section-divider {
+  @apply h-px w-full bg-gradient-to-r from-transparent via-gold/20 to-transparent;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
+}
+/* --- Premium Gold-Tint Scrollbar --- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.4);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.8);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+/* Firefox support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.4) transparent;
+}
+
+/* Custom Scrollbar Utility */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.3);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.6);
+}
+
+
+/* --- Yasin, Sadece Bu Kısmı index.css'in EN ALTINA Ekle --- */
+
+/* --- Premium Leather Modal Styling --- */
+.fixed.inset-0.z-\[100\],
+.fixed.inset-0.z-\[200\],
+.fixed.inset-0.z-\[300\],
+.fixed.inset-0.z-\[400\],
+.fixed.inset-0.z-\[500\],
+.fixed.inset-0.z-\[600\] {
+  background: radial-gradient(circle at 50% 0%, #1a2a4a 0%, #0f1c35 60%, #050a1a 100%) !important;
+  backdrop-filter: blur(25px) !important;
+  position: fixed;
+  overflow-y: auto;
+}
+
+.fixed.inset-0.z-\[100\]::before,
+.fixed.inset-0.z-\[200\]::before,
+.fixed.inset-0.z-\[300\]::before,
+.fixed.inset-0.z-\[400\]::before,
+.fixed.inset-0.z-\[500\]::before,
+.fixed.inset-0.z-\[600\]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("https://www.transparenttextures.com/patterns/padded-leather.png");
+  background-size: 400px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* 2. Sekmenin en altına o "baymayan" soft altın ışıltısını ekler */
+.fixed.inset-0.z-\[100\]::after,
+.fixed.inset-0.z-\[200\]::after,
+.fixed.inset-0.z-\[300\]::after,
+.fixed.inset-0.z-\[400\]::after,
+.fixed.inset-0.z-\[500\]::after,
+.fixed.inset-0.z-\[600\]::after {
+  content: "";
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 400px;
+  background: radial-gradient(circle at 50% 100%, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* 3. Sekme içindeki Bokeh/Parçacık efektlerini ana sayfa ile uyumlu hale getirir */
+.fixed.inset-0.z-\[200\] .bg-gold\/10 {
+  background-color: rgba(212, 175, 55, 0.03) !important;
+  filter: blur(80px) !important;
+}
+
+/* 4. Videoların altındaki başlıkları daha soft ve klas yapar */
+.fixed.inset-0.z-\[200\] h4 {
+  color: rgba(212, 175, 55, 0.8) !important;
+  transition: color 0.3s ease;
+}
+
+.fixed.inset-0.z-\[200\] .group:hover h4 {
+  color: #D4AF37 !important;
+}
+/* Mobil Menü Tamir Paketi */
+.fixed.inset-0.z-\[9999\] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: #0a192f !important; /* Lacivert arka plan */
+    z-index: 99999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Sayfa Kaymasını Engelle */
+html, body {
+    overflow-x: hidden !important;
+    width: 100%;
+}
