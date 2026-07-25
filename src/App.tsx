@@ -649,7 +649,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col selection:bg-gold selection:text-dark-stitch text-white">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col selection:bg-gold selection:text-dark-stitch text-white">
       {/* Main Background Glows - Optimized for Mobile Performance */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-navy-stitch/10 rounded-full blur-[80px] sm:blur-[120px]" />
@@ -658,22 +658,22 @@ export default function App() {
         <div className="absolute bottom-[-15%] right-[-10%] w-[60%] sm:w-[70%] h-[60%] sm:h-[70%] bg-gold/10 rounded-full blur-[150px] sm:blur-[200px] opacity-30 sm:opacity-40" />
       </div>
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/40 backdrop-blur-xl py-3 border-b border-gold/20' : 'bg-transparent py-6'}`}>
-        <div className="max-w-7xl mx-auto px-4 md:px-6 h-24 flex items-center justify-between">
-          <div className="flex items-center gap-2 lg:gap-3 xl:gap-5">
-            <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => {
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/40 backdrop-blur-xl py-3 border-b border-gold/20' : 'bg-transparent py-4 sm:py-6'}`}>
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-20 sm:h-24 flex items-center justify-between">
+          <div className="flex items-center gap-2 lg:gap-3 xl:gap-4 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 min-w-max" onClick={() => {
               setActiveContentKey(null);
               window.scrollTo(0, 0);
             }}>
-              <div className="w-9 h-9 md:w-10 md:h-10 bg-gold rounded-full flex items-center justify-center aspect-square shrink-0 overflow-hidden p-1.5">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-gold rounded-full flex items-center justify-center aspect-square shrink-0 overflow-hidden p-1 sm:p-1.5">
                 <Brain className="text-dark-stitch w-full h-full object-contain animate-logo-dual" />
               </div>
-              <div className="flex flex-col">
-                <span className="text-base md:text-lg font-serif font-bold tracking-tight text-white leading-none">EKREM YALÇIN</span>
-                <span className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-gold font-medium">Dr. Öğretim Üyesi</span>
+              <div className="flex flex-col shrink-0 min-w-max">
+                <span className="text-sm sm:text-base md:text-lg font-serif font-bold tracking-tight text-white leading-none whitespace-nowrap">EKREM YALÇIN</span>
+                <span className="text-[7px] sm:text-[8px] md:text-[9px] uppercase tracking-[0.15em] sm:tracking-[0.2em] text-gold font-medium whitespace-nowrap">Dr. Öğretim Üyesi</span>
               </div>
             </div>
-            <div className="hidden lg:flex items-center lg:gap-2.5 xl:gap-4">
+            <div className="hidden lg:flex items-center lg:gap-2 xl:gap-3.5">
               {navLinks.map((link) => (
                 <div 
                   key={link.name} 
@@ -735,12 +735,12 @@ export default function App() {
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-2 md:gap-3 ml-2 lg:ml-3 xl:ml-6 shrink-0">
+          <div className="hidden sm:flex items-center gap-2 md:gap-3 ml-2 lg:ml-3 xl:ml-6 shrink-0">
             <a 
               href="https://www.instagram.com/dr_ekremyalcin06/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="instagram-button hidden sm:flex !p-2.5 !px-2.5"
+              className="instagram-button !p-2.5 !px-2.5"
             >
               <Instagram className="w-4 h-4" />
             </a>
@@ -900,9 +900,9 @@ export default function App() {
           />
         </React.Suspense>
       ) : (
-        <main>
+        <main className="w-full max-w-full overflow-x-hidden">
         {/* Hero Section */}
-        <section id="home" className="relative min-h-screen flex items-center pt-24 overflow-hidden" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
+        <section id="home" className="relative min-h-screen flex items-center pt-24 pb-12 overflow-hidden" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
           {/* Transparent Background to allow global gradient to show */}
           <div className="absolute inset-0 z-0 bg-transparent" />
           
@@ -935,28 +935,28 @@ export default function App() {
           <div className="light-beam top-0 left-3/4 opacity-20" />
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-gold/5 to-transparent pointer-events-none" />
           
-          <div className="relative z-10 max-w-7xl mx-auto px-8 w-full py-10">
-            <div className="grid lg:grid-cols-12 gap-12 items-center">
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 w-full py-6 sm:py-10">
+            <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               <motion.div 
                 initial={isMobile ? { opacity: 0 } : { opacity: 0, x: -50 }}
                 animate={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
                 transition={{ duration: isMobile ? 0.5 : 1, delay: isMobile ? 0.1 : 0.2 }}
                 className="lg:col-span-6"
               >
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="h-px w-12 bg-gold/50" />
-                  <span className="text-gold text-xs font-bold tracking-[0.3em] uppercase">
+                <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+                  <div className="h-px w-8 sm:w-12 bg-gold/50 shrink-0" />
+                  <span className="text-gold text-[10px] sm:text-xs font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase break-words">
                     Beyin, Omurilik ve Sinir Cerrahisi
                   </span>
                 </div>
                 
-                <h1 className="text-5xl sm:text-6xl md:text-8xl font-serif leading-[1.1] mb-6 premium-text-gradient tracking-tight">
+                <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-serif leading-[1.15] mb-6 premium-text-gradient tracking-tight break-words">
                   Gelişmiş <br className="hidden sm:block" />
                   <span className="italic text-gold">Beyin Cerrahi</span> <br className="hidden sm:block" />
                   Çözümleri
                 </h1>
                 
-                <p className="text-xl text-white/60 mb-8 leading-relaxed max-w-xl font-light antialiased">
+                <p className="text-sm sm:text-lg md:text-xl text-white/60 mb-8 leading-relaxed max-w-xl font-light antialiased break-words">
                   Dr. Öğretim Üyesi Ekrem Yalçın liderliğinde, modern mikrocerrahi teknikleri ve teknolojik hassasiyetle sağlığınıza odaklanıyoruz.
                 </p>
                 
@@ -978,21 +978,21 @@ export default function App() {
                 initial={isMobile ? { opacity: 0 } : { opacity: 0, x: 50, scale: 0.9 }}
                 animate={isMobile ? { opacity: 1 } : { opacity: 1, x: 0, scale: 1 }}
                 transition={{ duration: isMobile ? 0.5 : 1, delay: isMobile ? 0.2 : 0.4 }}
-                className="lg:col-span-6 relative flex justify-end"
+                className="lg:col-span-6 relative flex justify-center lg:justify-end w-full max-w-full px-2 sm:px-0"
               >
-                <div className="relative group scale-100 sm:scale-105 lg:scale-[1.12] lg:translate-x-16 transition-transform duration-1000 origin-center lg:origin-right soft-glow-bg">
+                <div className="relative group w-full max-w-sm sm:max-w-none scale-100 sm:scale-105 lg:scale-[1.12] lg:translate-x-16 transition-transform duration-1000 origin-center lg:origin-right soft-glow-bg">
                   {/* Tech HUD Elements - Enhanced for "Robotic" feel */}
-                  <div className="absolute -inset-10 border border-gold/10 rounded-full -z-10 animate-[spin_25s_linear_infinite] opacity-20 sm:opacity-30" />
-                  <div className="absolute -inset-6 border border-gold/20 rounded-sm -z-10 animate-pulse hidden sm:block" />
+                  <div className="absolute -inset-10 border border-gold/10 rounded-full -z-10 animate-[spin_25s_linear_infinite] opacity-0 sm:opacity-20 pointer-events-none" />
+                  <div className="absolute -inset-6 border border-gold/20 rounded-sm -z-10 animate-pulse hidden sm:block pointer-events-none" />
                   <div className="absolute -inset-1 border border-gold/40 rounded-sm -z-10" />
                   
                   {/* Corner Accents */}
-                  <div className="absolute -top-2 -left-2 w-8 h-8 border-t-2 border-l-2 border-gold z-20" />
-                  <div className="absolute -top-2 -right-2 w-8 h-8 border-t-2 border-r-2 border-gold z-20" />
-                  <div className="absolute -bottom-2 -left-2 w-8 h-8 border-b-2 border-l-2 border-gold z-20" />
-                  <div className="absolute -bottom-2 -right-2 w-8 h-8 border-b-2 border-r-2 border-gold z-20" />
+                  <div className="absolute -top-2 -left-2 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-l-2 border-gold z-20" />
+                  <div className="absolute -top-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-r-2 border-gold z-20" />
+                  <div className="absolute -bottom-2 -left-2 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-l-2 border-gold z-20" />
+                  <div className="absolute -bottom-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-r-2 border-gold z-20" />
 
-                  <div className="relative z-10 rounded-sm overflow-hidden border border-gold/30 shadow-[0_0_130px_rgba(212,175,55,0.3)] aspect-[4/5] lg:aspect-auto">
+                  <div className="relative z-10 rounded-sm overflow-hidden border border-gold/30 shadow-[0_0_130px_rgba(212,175,55,0.3)] aspect-[4/5] lg:aspect-auto w-full">
                     <img 
                       src="https://i.ibb.co/LD6xLykj/ekrem-yalcin-kimdir-3.jpg" 
                       alt="Dr. Ekrem Yalçın" 
@@ -1003,20 +1003,22 @@ export default function App() {
                       decoding="async"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-dark-stitch via-transparent to-transparent opacity-70" />
-                    <div className="absolute bottom-0 left-0 w-full p-10 bg-gradient-to-t from-dark-stitch via-dark-stitch/90 to-transparent">
-                      <div className="text-4xl font-serif font-bold text-white mb-2 tracking-tight drop-shadow-lg">Dr. Ekrem Yalçın</div>
-                      <div className="text-sm font-bold tracking-[0.3em] uppercase text-gold drop-shadow-md">Beyin ve Sinir Cerrahisi Uzmanı</div>
+                    <div className="absolute bottom-0 left-0 w-full p-4 sm:p-8 lg:p-10 bg-gradient-to-t from-dark-stitch via-dark-stitch/90 to-transparent">
+                      <div className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-white mb-1.5 tracking-tight drop-shadow-lg break-words">Dr. Ekrem Yalçın</div>
+                      <div className="text-xs sm:text-sm font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase text-gold drop-shadow-md break-words">Beyin ve Sinir Cerrahisi Uzmanı</div>
                     </div>
                   </div>
 
-                  {/* Tech Link Elements - More prominent */}
-                  <div className="absolute top-1/4 -left-12 w-24 h-px bg-gradient-to-l from-gold/80 to-transparent" />
-                  <div className="absolute top-1/4 -left-12 w-3 h-3 rounded-full bg-gold shadow-[0_0_15px_#D4AF37] animate-ping" />
-                  <div className="absolute top-1/4 -left-12 w-3 h-3 rounded-full bg-gold shadow-[0_0_10px_#D4AF37]" />
-                  
-                  <div className="absolute bottom-1/4 -right-12 w-24 h-px bg-gradient-to-r from-gold/80 to-transparent" />
-                  <div className="absolute bottom-1/4 -right-12 w-3 h-3 rounded-full bg-gold shadow-[0_0_15px_#D4AF37] animate-ping" />
-                  <div className="absolute bottom-1/4 -right-12 w-3 h-3 rounded-full bg-gold shadow-[0_0_10px_#D4AF37]" />
+                  {/* Tech Link Elements - Hidden on small mobile to prevent overflow */}
+                  <div className="hidden sm:block">
+                    <div className="absolute top-1/4 -left-12 w-24 h-px bg-gradient-to-l from-gold/80 to-transparent" />
+                    <div className="absolute top-1/4 -left-12 w-3 h-3 rounded-full bg-gold shadow-[0_0_15px_#D4AF37] animate-ping" />
+                    <div className="absolute top-1/4 -left-12 w-3 h-3 rounded-full bg-gold shadow-[0_0_10px_#D4AF37]" />
+                    
+                    <div className="absolute bottom-1/4 -right-12 w-24 h-px bg-gradient-to-r from-gold/80 to-transparent" />
+                    <div className="absolute bottom-1/4 -right-12 w-3 h-3 rounded-full bg-gold shadow-[0_0_15px_#D4AF37] animate-ping" />
+                    <div className="absolute bottom-1/4 -right-12 w-3 h-3 rounded-full bg-gold shadow-[0_0_10px_#D4AF37]" />
+                  </div>
                 </div>
               </motion.div>
             </div>
@@ -1104,12 +1106,12 @@ export default function App() {
 
         {/* About Section */}
         <section id="about" className="py-12 relative tech-pattern" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
-          <div className="max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-16 items-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <motion.div 
               {...animAboutImage}
               className="relative group"
             >
-              <div className="relative z-10 aspect-[4/5] rounded-sm overflow-hidden border border-gold/30 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+              <div className="relative z-10 aspect-[4/5] rounded-sm overflow-hidden border border-gold/30 shadow-[0_0_50px_rgba(0,0,0,0.5)] w-full">
                 <img 
                   src="https://i.ibb.co/Jw5v18ZQ/Whats-App-mage-2026-04-10-at-09-13-14.jpg" 
                   alt="Dr. Ekrem Yalçın" 
@@ -1120,8 +1122,8 @@ export default function App() {
                 />
                 <div className="absolute inset-0 bg-gold/5 pointer-events-none" />
               </div>
-              <div className="absolute -top-8 -left-8 w-full h-full border border-gold/20 -z-0" />
-              <div className="absolute -bottom-8 -right-8 w-32 h-32 border-r border-b border-gold/40" />
+              <div className="hidden sm:block absolute -top-8 -left-8 w-full h-full border border-gold/20 -z-0" />
+              <div className="hidden sm:block absolute -bottom-8 -right-8 w-32 h-32 border-r border-b border-gold/40" />
               {/* Decorative Glow */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gold/5 blur-[100px] rounded-full -z-10" />
             </motion.div>
@@ -1129,9 +1131,9 @@ export default function App() {
             <motion.div
               {...animAboutText}
             >
-              <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-3 block">Dr. Ekrem Yalçın Kimdir?</span>
-              <h2 className="text-5xl md:text-6xl font-serif mb-4 leading-tight">Akademik Birikim ve <span className="text-gold">Cerrahi Hassasiyet</span></h2>
-              <div className="space-y-4 text-white/50 text-lg leading-relaxed mb-6 font-light">
+              <span className="text-gold font-bold tracking-[0.3em] sm:tracking-[0.4em] uppercase text-xs mb-3 block">Dr. Ekrem Yalçın Kimdir?</span>
+              <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif mb-4 leading-tight break-words">Akademik Birikim ve <span className="text-gold">Cerrahi Hassasiyet</span></h2>
+              <div className="space-y-4 text-white/50 text-base sm:text-lg leading-relaxed mb-6 font-light break-words">
                 <p>
                   Op. Dr. Ekrem YALÇIN, 1967 yılında Konya’nın Kulu ilçesinde doğmuştur. 1991 yılında Selçuk Üniversitesi Tıp Fakültesi’nden mezun olmuş, 2001 yılında İzmir SSK Eğitim ve Araştırma Hastanesi’nde uzmanlık eğitimini tamamlayarak Beyin ve Sinir Cerrahisi Uzmanı unvanını almıştır.
                 </p>
@@ -1161,10 +1163,10 @@ export default function App() {
 
         {/* Specialties Section - Simplified to 2 Large Category Cards */}
         <section id="specialties" className="py-10 relative overflow-hidden" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
-          <div className="max-w-4xl mx-auto px-8">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8">
             <div className="flex flex-col items-center text-center mb-6">
               <span className="text-gold font-bold tracking-[0.4em] uppercase text-[10px] mb-4">Hizmetlerimiz</span>
-              <h2 className="text-3xl md:text-5xl font-serif premium-text-gradient pulsing-headline">Uzmanlık Alanları</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-5xl font-serif premium-text-gradient pulsing-headline break-words">Uzmanlık Alanları</h2>
               <div className="h-px w-16 bg-gold/30 mt-6" />
             </div>
             
@@ -1178,7 +1180,7 @@ export default function App() {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                   setTimeout(() => setOpenDropdown('Tedaviler'), 500);
                 }}
-                className="glass-card p-8 rounded-sm text-center flex flex-col items-center gap-6 group border-gold/20 hover:border-gold/60 transition-all duration-500 cursor-pointer relative overflow-hidden rotating-border-glow"
+                className="glass-card p-6 sm:p-8 rounded-sm text-center flex flex-col items-center gap-6 group border-gold/20 hover:border-gold/60 transition-all duration-500 cursor-pointer relative overflow-hidden rotating-border-glow"
               >
                 <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center text-gold/60 group-hover:text-gold transition-colors duration-500 drop-shadow-[0_0_15px_rgba(212,175,55,0.2)] border border-gold/20">
                   <Stethoscope className="w-8 h-8" />
@@ -1203,7 +1205,7 @@ export default function App() {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                   setTimeout(() => setOpenDropdown('Hastalıklar'), 500);
                 }}
-                className="glass-card p-8 rounded-sm text-center flex flex-col items-center gap-6 group border-gold/20 hover:border-gold/60 transition-all duration-500 cursor-pointer relative overflow-hidden rotating-border-glow"
+                className="glass-card p-6 sm:p-8 rounded-sm text-center flex flex-col items-center gap-6 group border-gold/20 hover:border-gold/60 transition-all duration-500 cursor-pointer relative overflow-hidden rotating-border-glow"
               >
                 <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center text-gold/60 group-hover:text-gold transition-colors duration-500 drop-shadow-[0_0_15px_rgba(212,175,55,0.2)] border border-gold/20">
                   <Brain className="w-8 h-8" />
@@ -1227,12 +1229,12 @@ export default function App() {
           {/* Subtle Glow for Certificates Section */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gold/5 rounded-full blur-[120px] pointer-events-none opacity-30" />
           
-          <div className="max-w-7xl mx-auto px-8 relative z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 relative z-10">
             <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-8">
               <div className="max-w-2xl">
                 <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-4 block">Başarılarımız</span>
-                <h2 className="text-5xl md:text-6xl font-serif premium-text-gradient leading-tight">Uluslararası Başarılar ve <span className="italic text-gold/80">Sertifikalar</span></h2>
-                <p className="mt-4 text-white/40 text-lg font-light leading-relaxed antialiased">
+                <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif premium-text-gradient leading-tight break-words">Uluslararası Başarılar ve <span className="italic text-gold/80">Sertifikalar</span></h2>
+                <p className="mt-4 text-white/40 text-sm sm:text-lg font-light leading-relaxed antialiased break-words">
                   Tıbbi mükemmeliyet yolculuğumuzda kazandığımız uluslararası geçerliliğe sahip yetki belgeleri ve uzmanlık sertifikaları.
                 </p>
               </div>
@@ -1335,10 +1337,10 @@ export default function App() {
           <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-gold/3 rounded-full blur-[100px] pointer-events-none" />
           <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-gold/3 rounded-full blur-[100px] pointer-events-none" />
           
-          <div className="max-w-7xl mx-auto px-8 relative z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 relative z-10">
             <div className="flex flex-col items-center text-center mb-10">
               <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-6 block">İletişim</span>
-              <h2 className="text-5xl md:text-6xl font-serif mb-8 premium-text-gradient">Sağlığınız İçin <br />Bizimle <span className="text-gold">İletişime Geçin</span></h2>
+              <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif mb-8 premium-text-gradient break-words">Sağlığınız İçin <br />Bizimle <span className="text-gold">İletişime Geçin</span></h2>
               <div className="h-px w-24 bg-gold/30 mt-4 mx-auto" />
             </div>
             
@@ -1346,7 +1348,7 @@ export default function App() {
               {/* Address Card */}
               <motion.div 
                 whileHover={cardHoverHigh}
-                className="glass-card p-12 rounded-sm border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden"
+                className="glass-card p-6 sm:p-8 md:p-12 rounded-sm border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden"
               >
                 {/* Subtle Card Glow */}
                 <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gold/5 blur-3xl group-hover:bg-gold/10 transition-all duration-500" />
@@ -1365,7 +1367,7 @@ export default function App() {
               {/* Phone Card */}
               <motion.div 
                 whileHover={cardHoverHigh}
-                className="glass-card p-12 rounded-sm border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden"
+                className="glass-card p-6 sm:p-8 md:p-12 rounded-sm border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden"
               >
                 {/* Subtle Card Glow */}
                 <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gold/5 blur-3xl group-hover:bg-gold/10 transition-all duration-500" />
@@ -1395,7 +1397,7 @@ export default function App() {
               {/* Email Card */}
               <motion.div 
                 whileHover={cardHoverHigh}
-                className="glass-card p-12 rounded-sm border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden"
+                className="glass-card p-6 sm:p-8 md:p-12 rounded-sm border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden"
               >
                 {/* Subtle Card Glow */}
                 <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gold/5 blur-3xl group-hover:bg-gold/10 transition-all duration-500" />
@@ -1407,7 +1409,7 @@ export default function App() {
                 <a 
                   href="mailto:info@drekremyalcin.com.tr" 
                   onClick={() => trackGAEvent('Contact', 'Email Click', 'info@drekremyalcin.com.tr')}
-                  className="text-white/70 hover:text-gold transition-colors text-sm font-medium tracking-wide"
+                  className="text-white/70 hover:text-gold transition-colors text-sm font-medium tracking-wide break-all"
                 >
                   info@drekremyalcin.com.tr
                 </a>
@@ -1432,12 +1434,12 @@ export default function App() {
 
         {/* Locations Section */}
         <section id="locations" className="pt-2 pb-10 relative overflow-hidden border-t border-white/5" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
-          <div className="max-w-7xl mx-auto px-8 relative z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 relative z-10">
             <div className="flex flex-col md:flex-row justify-between items-end mb-2 gap-8">
               <div>
                 <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-[2px] block">Ulaşım</span>
-                <h2 className="text-5xl md:text-6xl font-serif premium-text-gradient">Lokasyonumuz</h2>
-                <p className="mt-0 text-white/40 text-lg font-light max-w-xl">
+                <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif premium-text-gradient break-words">Lokasyonumuz</h2>
+                <p className="mt-0 text-white/40 text-sm sm:text-lg font-light max-w-xl break-words">
                   Ankara'nın merkezi noktasında, en ileri teknolojik donanımlara sahip hastanemizde hizmetinizdeyiz.
                 </p>
               </div>
@@ -1445,12 +1447,12 @@ export default function App() {
 
             <div className="grid lg:grid-cols-12 gap-8 items-stretch">
               {/* Address Cards */}
-              <div className="lg:col-span-4 h-[400px] lg:h-[450px] flex flex-col">
+              <div className="lg:col-span-4 min-h-[300px] lg:h-[450px] flex flex-col">
                 {locations.map((loc) => (
                   <motion.div 
                     key={loc.id}
                     whileHover={navHoverRight}
-                    className="glass-card p-8 rounded-sm border-gold/20 hover:border-gold/60 transition-all duration-500 group relative overflow-hidden h-full flex flex-col"
+                    className="glass-card p-6 sm:p-8 rounded-sm border-gold/20 hover:border-gold/60 transition-all duration-500 group relative overflow-hidden h-full flex flex-col"
                   >
                     <div className="absolute top-0 left-0 w-1 h-full bg-gold/0 group-hover:bg-gold transition-all duration-500" />
                     <div className="flex items-start gap-4 h-full">
@@ -1459,12 +1461,12 @@ export default function App() {
                       </div>
                       <div className="flex flex-col justify-between h-full flex-1">
                         <div>
-                          <h4 className="text-gold font-serif text-xl font-bold mb-3">{loc.name}</h4>
-                          <p className="text-white/50 text-sm leading-relaxed mb-6">{loc.address}</p>
+                          <h4 className="text-gold font-serif text-lg sm:text-xl font-bold mb-3">{loc.name}</h4>
+                          <p className="text-white/50 text-xs sm:text-sm leading-relaxed mb-6">{loc.address}</p>
                         </div>
                         <div className="flex flex-col gap-4 mt-auto">
-                          <div className="flex items-center gap-3 text-white/40 text-sm">
-                            <Phone className="w-4 h-4 text-gold/60" />
+                          <div className="flex items-center gap-3 text-white/40 text-xs sm:text-sm">
+                            <Phone className="w-4 h-4 text-gold/60 shrink-0" />
                             <span>{loc.phone}</span>
                           </div>
                           <a 
@@ -1484,7 +1486,7 @@ export default function App() {
               </div>
 
               {/* Map Container */}
-              <div ref={mapContainerRef} className="lg:col-span-8 h-[400px] lg:h-[450px] rounded-lg overflow-hidden border-2 border-gold shadow-[0_0_40px_rgba(212,175,55,0.25)] relative">
+              <div ref={mapContainerRef} className="lg:col-span-8 h-[350px] sm:h-[400px] lg:h-[450px] rounded-lg overflow-hidden border-2 border-gold shadow-[0_0_40px_rgba(212,175,55,0.25)] relative">
                 {isMapInView ? (
                   <iframe
                     src="https://maps.google.com/maps?q=Özel+Ortadoğu+Hastanesi+Yenimahalle+Ankara&t=&z=16&ie=UTF8&iwloc=&output=embed"
@@ -1504,7 +1506,7 @@ export default function App() {
                 )}
                 
                 {/* Map Overlay for Premium Look */}
-                <div className="absolute inset-0 pointer-events-none border-[20px] border-dark-stitch/5" />
+                <div className="absolute inset-0 pointer-events-none border-[10px] sm:border-[20px] border-dark-stitch/5" />
               </div>
             </div>
           </div>
@@ -1517,7 +1519,7 @@ export default function App() {
         {/* Footer Glow - Subtle and soft */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-full bg-gold/5 blur-[150px] pointer-events-none opacity-40" />
         
-        <div className="max-w-7xl mx-auto px-8 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
             <div className="lg:col-span-1">
               <div className="text-2xl font-serif font-bold tracking-tighter gold-text-gradient mb-4">
