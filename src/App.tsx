@@ -735,30 +735,35 @@ export default function App() {
               ))}
             </div>
           </div>
-          <div className="hidden sm:flex items-center gap-2 md:gap-3 ml-2 lg:ml-3 xl:ml-6 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 ml-1 sm:ml-2 lg:ml-3 xl:ml-6 shrink-0">
             <a 
               href="https://www.instagram.com/dr_ekremyalcin06/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="instagram-button !p-2.5 !px-2.5"
+              className="instagram-button !p-2 sm:!p-2.5 !px-2 sm:!px-2.5 shrink-0"
+              title="Instagram"
             >
-              <Instagram className="w-4 h-4" />
+              <Instagram className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </a>
             <button 
               onClick={() => {
-                trackGAEvent('Appointment', 'Click', 'Header Desktop Randevu Al');
+                trackGAEvent('Appointment', 'Click', 'Header Randevu Al');
                 setIsAppointmentModalOpen(true);
               }} 
-              className="premium-button"
+              className="premium-button !px-2.5 sm:!px-6 !py-1.5 sm:!py-3 !text-[10px] sm:!text-xs shrink-0 whitespace-nowrap"
             >
               Randevu Al
             </button>
+            
+            {/* Mobile Toggle */}
+            <button 
+              className="lg:hidden text-white p-1.5 sm:p-2 flex items-center justify-center shrink-0 min-h-[36px] min-w-[36px]" 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Menü"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
-          
-          {/* Mobile Toggle */}
-          <button className="lg:hidden text-white min-h-[44px] min-w-[44px] flex items-center justify-center" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-            {isMobileMenuOpen ? <X /> : <Menu />}
-          </button>
         </div>
 
         {/* Mobile Menu */}
@@ -980,17 +985,17 @@ export default function App() {
                 transition={{ duration: isMobile ? 0.5 : 1, delay: isMobile ? 0.2 : 0.4 }}
                 className="lg:col-span-6 relative flex justify-center lg:justify-end w-full max-w-full px-2 sm:px-0"
               >
-                <div className="relative group w-full max-w-sm sm:max-w-none scale-100 sm:scale-105 lg:scale-[1.12] lg:translate-x-16 transition-transform duration-1000 origin-center lg:origin-right soft-glow-bg">
+                <div className="relative group w-full max-w-[calc(100vw-2.5rem)] sm:max-w-none scale-100 sm:scale-105 lg:scale-[1.12] lg:translate-x-16 transition-transform duration-1000 origin-center lg:origin-right soft-glow-bg">
                   {/* Tech HUD Elements - Enhanced for "Robotic" feel */}
-                  <div className="absolute -inset-10 border border-gold/10 rounded-full -z-10 animate-[spin_25s_linear_infinite] opacity-0 sm:opacity-20 pointer-events-none" />
+                  <div className="absolute -inset-10 border border-gold/10 rounded-full -z-10 animate-[spin_25s_linear_infinite] opacity-0 sm:opacity-20 pointer-events-none hidden sm:block" />
                   <div className="absolute -inset-6 border border-gold/20 rounded-sm -z-10 animate-pulse hidden sm:block pointer-events-none" />
-                  <div className="absolute -inset-1 border border-gold/40 rounded-sm -z-10" />
+                  <div className="absolute inset-0 sm:-inset-1 border border-gold/40 rounded-sm -z-10 pointer-events-none" />
                   
-                  {/* Corner Accents */}
-                  <div className="absolute -top-2 -left-2 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-l-2 border-gold z-20" />
-                  <div className="absolute -top-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-r-2 border-gold z-20" />
-                  <div className="absolute -bottom-2 -left-2 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-l-2 border-gold z-20" />
-                  <div className="absolute -bottom-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-r-2 border-gold z-20" />
+                  {/* Corner Accents - Contained within bounds on mobile */}
+                  <div className="hidden sm:block absolute -top-2 -left-2 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-l-2 border-gold z-20 pointer-events-none" />
+                  <div className="hidden sm:block absolute -top-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-r-2 border-gold z-20 pointer-events-none" />
+                  <div className="hidden sm:block absolute -bottom-2 -left-2 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-l-2 border-gold z-20 pointer-events-none" />
+                  <div className="hidden sm:block absolute -bottom-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-r-2 border-gold z-20 pointer-events-none" />
 
                   <div className="relative z-10 rounded-sm overflow-hidden border border-gold/30 shadow-[0_0_130px_rgba(212,175,55,0.3)] aspect-[4/5] lg:aspect-auto w-full">
                     <img 

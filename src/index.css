@@ -17,8 +17,8 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    overflow-x: hidden;
-    max-width: 100vw;
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
     width: 100%;
     height: auto;
     min-height: 100%;
@@ -34,8 +34,8 @@
     position: relative;
     min-height: 100vh;
     height: auto;
-    overflow-x: hidden;
-    max-width: 100vw;
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
     width: 100%;
     overflow-y: auto;
   }
