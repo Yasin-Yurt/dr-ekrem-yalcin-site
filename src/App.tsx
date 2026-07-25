@@ -902,7 +902,7 @@ export default function App() {
       ) : (
         <main className="w-full max-w-full overflow-x-hidden">
         {/* Hero Section */}
-        <section id="home" className="relative min-h-screen flex items-center pt-24 pb-12 overflow-hidden" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
+        <section id="home" className="relative min-h-screen flex items-center pt-32 md:pt-40 pb-12 overflow-hidden w-full max-w-full" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
           {/* Transparent Background to allow global gradient to show */}
           <div className="absolute inset-0 z-0 bg-transparent" />
           
@@ -950,7 +950,7 @@ export default function App() {
                   </span>
                 </div>
                 
-                <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-serif leading-[1.15] mb-6 premium-text-gradient tracking-tight break-words">
+                <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif leading-[1.15] mb-6 premium-text-gradient tracking-tight break-words">
                   Gelişmiş <br className="hidden sm:block" />
                   <span className="italic text-gold">Beyin Cerrahi</span> <br className="hidden sm:block" />
                   Çözümleri
@@ -1141,14 +1141,14 @@ export default function App() {
                   Rize, Trabzon, Ankara ve Van illerinde çeşitli hastanelerde Beyin, Omurilik ve Sinir Cerrahisi Uzmanı ve Başhekim olarak görev yapmıştır. Halen Ankara Medipol Üniversitesi Tıp Fakültesi Beyin, Omurilik ve Sinir Cerrahisi Anabilim Dalı’nda Doktor Öğretim Üyesi olarak görevine devam etmektedir.
                 </p>
               </div>
-              <div className="grid grid-cols-2 gap-12 mb-6">
-                <div>
-                  <div className="text-4xl font-serif text-gold mb-1">20+</div>
-                  <div className="text-xs tracking-widest uppercase text-white/30">Yıllık Deneyim</div>
+              <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 mb-6">
+                <div className="flex flex-col sm:block">
+                  <div className="text-3xl sm:text-4xl font-serif text-gold mb-1">20+</div>
+                  <div className="text-xs tracking-widest uppercase text-white/30 break-words">Yıllık Deneyim</div>
                 </div>
-                <div>
-                  <div className="text-4xl font-serif text-gold mb-1">10000+</div>
-                  <div className="text-xs tracking-widest uppercase text-white/30">Başarılı Operasyon</div>
+                <div className="flex flex-col sm:block">
+                  <div className="text-3xl sm:text-4xl font-serif text-gold mb-1">10000+</div>
+                  <div className="text-xs tracking-widest uppercase text-white/30 break-words">Başarılı Operasyon</div>
                 </div>
               </div>
               <button 
