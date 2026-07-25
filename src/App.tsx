@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Brain, 
-  Layers, 
-  Zap, 
-  Activity, 
   Award, 
   Play, 
   Phone, 
@@ -22,11 +19,16 @@ import {
   ArrowRight,
   ChevronLeft,
   Calendar,
-  MousePointer2,
-  Search
+  Search,
+  Lock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ContentPage } from './components/ContentPage';
+import type { LegalDocument } from './components/LegalModal';
+import { sanitizeInput, sanitizeForMessage, loadRecaptchaScript, executeRecaptcha } from './utils/security';
+import CookieConsent from './components/CookieConsent';
+
+const ContentPage = React.lazy(() => import('./components/ContentPage').then(module => ({ default: module.ContentPage })));
+const LegalModal = React.lazy(() => import('./components/LegalModal'));
 
 // --- Types ---
 interface Video {
@@ -53,20 +55,217 @@ interface NavLink {
   }[];
 }
 
+const legalDocuments: Record<string, LegalDocument> = {
+  kvkk: {
+    id: 'kvkk',
+    title: 'KVKK Aydınlatma Metni',
+    subtitle: '6698 Sayılı Kişisel Verilerin Korunması Kanunu Uyarınca Hasta ve Ziyaretçi Bilgilendirmesi',
+    badge: 'Yasal Mevzuat - KVKK Madde 10',
+    updatedAt: '24 Temmuz 2026',
+    sections: [
+      {
+        heading: '1. Veri Sorumlusunun Kimliği',
+        text: [
+          '6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca, Op. Dr. Ekrem Yalçın Muayenehanesi/Kliniği ("Veri Sorumlusu") olarak, hastalarımızın, danışanlarımızın ve web sitemizi (drekremyalcin.com.tr) ziyaret eden kullanıcılarımızın kişisel verilerinin güvenliğine ve gizliliğine azami hassasiyet göstermekteyiz.'
+        ]
+      },
+      {
+        heading: '2. İşlenen Kişisel Veriler ve Toplama Yöntemleri',
+        text: [
+          'Web sitemizdeki iletişim formları, online randevu talep alanları ve WhatsApp direkt iletişim kanalları üzerinden tarafımıza ilettiğiniz;',
+          '• Kimlik Bilgileri: Ad, soyad, T.C. kimlik numarası (randevu ve tıbbi kayıt durumunda).',
+          '• İletişim Bilgileri: Telefon numarası, e-posta adresi.',
+          '• Tıbbi ve Sağlık Bilgileri: Randevu notu veya şikayet alanında bizzat ilettiğiniz sağlık geçmişi, semptomlar ve tıbbi süreç bilgileri.',
+          '• İşlem Güvenliği Bilgileri: IP adresi, site erişim logları ve çerez kayıtları.'
+        ]
+      },
+      {
+        heading: '3. Kişisel Verilerin İşlenme Amaçları',
+        text: [
+          'Kişisel verileriniz KVKK Madde 5 ve 6 prensiplerine uygun olarak şu amaçlarla işlenmektedir:',
+          '• Tıbbi teşhis, muayene, tedavi ve bakım hizmetlerinin yürütülmesi,',
+          '• Online randevu süreçlerinin planlanması ve hasta iletişimi,',
+          '• 3359 sayılı Sağlık Hizmetleri Temel Kanunu ve ilgili Sağlık Bakanlığı mevzuatı uyarınca yasal tıbbi kayıt tutma yükümlülüklerinin yerine getirilmesi,',
+          '• Yetkili kamu kurum ve kuruluşlarına yasal bilgi verme yükümlülüklerinin ifası.'
+        ]
+      },
+      {
+        heading: '4. Verilerin Aktarımı ve Güvenliği',
+        text: [
+          'Kişisel verileriniz, KVKK\'nın 8. ve 9. maddelerine uygun olarak, reklam, pazarlama veya ticari amaçlarla KESİNLİKLE 3. şahıslara veya özel kurumlara aktarılmaz ve satılmaz. Yalnızca yasal zorunluluk hallerinde T.C. Sağlık Bakanlığı, Yargı Mercileri ve yetkili kamu kurumları ile paylaşılabilir.',
+          'Verileriniz endüstri standardı SSL/TLS 1.3 şifreleme ve güvenli sunucu altyapıları ile korunmaktadır.'
+        ]
+      },
+      {
+        heading: '5. İlgili Kişinin Hakları (KVKK Madde 11)',
+        text: [
+          'Veri sahibi olarak info@drekremyalcin.com.tr e-posta adresi üzerinden kliniğimize başvurarak;',
+          '• Kişisel verilerinizin işlenip işlenmediğini öğrenme,',
+          '• İşlenmişse buna ilişkin bilgi talep etme,',
+          '• Amacına uygun kullanılıp kullanılmadığını öğrenme,',
+          '• Eksik veya yanlış işlenmişse düzeltilmesini ve silinmesini talep etme haklarına sahipsiniz.'
+        ]
+      }
+    ]
+  },
+  gizlilik: {
+    id: 'gizlilik',
+    title: 'Gizlilik ve Çerez Politikası',
+    subtitle: 'drekremyalcin.com.tr Web Sitesi Çerez (Cookie) Kullanımı ve Veri Güvenliği Esasları',
+    badge: 'Gizlilik ve Çerez Yönetimi',
+    updatedAt: '24 Temmuz 2026',
+    sections: [
+      {
+        heading: '1. Gizlilik Prensiplerimiz',
+        text: [
+          'Op. Dr. Ekrem Yalçın web sitesi, ziyaretçilerimizin gizlilik haklarını korumayı ve şeffaflığı temel ilke edinmiştir. Bu politika, sitemizi ziyaret ettiğinizde toplanan verilerin ve kullanılan çerezlerin amacını açıklar.'
+        ]
+      },
+      {
+        heading: '2. Çerez (Cookie) Nedir ve Neden Kullanılır?',
+        text: [
+          'Çerezler, ziyaret ettiğiniz web siteleri tarafından tarayıcınıza veya cihazınıza kaydedilen küçük metin dosyalarıdır. Çerezler sitemizin güvenli, hızlı ve verimli çalışmasını sağlar.'
+        ]
+      },
+      {
+        heading: '3. Sitemizde Kullanılan Çerez Türleri',
+        text: [
+          '• Zorunlu Çerezler: Web sitesinin güvenli bir şekilde çalışması ve sayfa gezinme fonksiyonlarının yürütülmesi için şarttır.',
+          '• Performans ve Analitik Çerezleri: Google Analytics gibi araçlarla site trafiğini, ziyaretçi sayılarını ve en çok incelenen sayfaları anonim olarak analiz ederek site deneyimini geliştirmemize yardımcı olur.',
+          '• İşlevsel Çerezler: Dil tercihi ve form dolum ayarları gibi kullanıcı tercihlerini hatırlamak amacıyla kullanılır.'
+        ]
+      },
+      {
+        heading: '4. Çerez Tercihlerinin Yönetimi',
+        text: [
+          'Ziyaretçilerimiz diledikleri zaman tarayıcı ayarlarını (Chrome, Safari, Firefox, Edge vb.) değiştirerek çerezleri engelleyebilir, kısıtlayabilir veya silebilirler. Ancak zorunlu çerezlerin kapatılması durumunda sitenin bazı fonksiyonları kısıtlanabilir.'
+        ]
+      }
+    ]
+  },
+  yasal: {
+    id: 'yasal',
+    title: 'Yasal Uyarı & Tıbbi Sorumluluk Reddi',
+    subtitle: 'T.C. Sağlık Bakanlığı Mevzuatı Uyarınca Zorunlu Bilgilendirme ve Tıbbi Disclaimer',
+    badge: 'T.C. Sağlık Bakanlığı Mevzuatı Uyarınca',
+    updatedAt: '24 Temmuz 2026',
+    sections: [
+      {
+        heading: '1. Bilgilendirme Amacı (Tıbbi Teşhis ve Tedavi Yerine Geçmez)',
+        text: [
+          'Bu internet sitesinde (drekremyalcin.com.tr) yer alan tüm makaleler, videolar, görseller, teknik açıklamalar ve vaka bilgilendirmeleri YALNIZCA kamuoyunu ve hastaları genel olarak bilgilendirmek amacıyla hazırlanmıştır.',
+          'Sitede sunulan hiçbir bilgi, tanı, reçete, kişisel tedavi tavsiyesi veya tıbbi teşhis yerine geçmez. Sitedeki bilgilere dayanarak doğrudan bir tedaviye başlanmamalı veya mevcut bir tedavi asla sonlandırılmamalıdır.'
+        ]
+      },
+      {
+        heading: '2. Birebir Hekim Muayenesi Zorunluluğu',
+        text: [
+          'Tıp biliminde her hastanın klinik tablosu, anatomisi, şikayetleri ve tedavi yanıtı kendine özgüdür ve bireysel olarak değerlendirilmelidir.',
+          'Kesin tanı ve tedavi ancak Beyin, Omurilik ve Sinir Cerrahisi Uzmanı Op. Dr. Ekrem Yalçın veya yetkili bir hekim tarafından klinik ortamda gerçekleştirilecek bizzat muayene, nörolojik tetkikler (MR, Tomografi, EMG vb.) ve değerlendirmeler sonucunda konulabilir.'
+        ]
+      },
+      {
+        heading: '3. Reklam ve Yönlendirme Yasağı Uyarınca',
+        text: [
+          'Bu web sitesi, 1219 sayılı Tababet ve Şuabatı San\'atlarının Tarzı İcrasına Dair Kanun ve T.C. Sağlık Bakanlığı Sağlık Hizmetlerinde Tanıtım ve Bilgilendirme Faaliyetleri Hakkında Yönetmelik hükümlerine tam uyumlu olarak kurgulanmıştır. Sitede yer alan ifadeler reklam, haksız rekabet veya hastaları ticari yönlendirme amacı taşımaz.'
+        ]
+      },
+      {
+        heading: '4. Telif Hakları ve Kullanım Şartları',
+        text: [
+          'Sitedeki tüm yazılı içerik, özgün videolar, cerrahi şemalar ve görseller Op. Dr. Ekrem Yalçın\'a aittir. Yazılı izin alınmaksızın kopyalanamaz, çoğaltılamaz veya ticari amaçla dağıtılamaz.'
+        ]
+      }
+    ]
+  },
+  hasta: {
+    id: 'hasta',
+    title: 'Hasta Hakları ve İletişim Aydınlatması',
+    subtitle: 'Hasta Hakları Yönetmeliği Uyarınca Hasta Bilgilendirmesi ve İletişim Süreçleri',
+    badge: 'Hasta Hakları Yönetmeliği',
+    updatedAt: '24 Temmuz 2026',
+    sections: [
+      {
+        heading: '1. Hasta Hakları Genel İlkeleri',
+        text: [
+          'Op. Dr. Ekrem Yalçın Muayenehanesi/Kliniği bünyesinde, T.C. Sağlık Bakanlığı Hasta Hakları Yönetmeliği hükümleri ve evrensel tıp etiği kuralları çerçevesinde her hastamızın en yüksek kalitede, insani değerlere saygılı sağlık hizmeti alma hakkı garanti altındadır.'
+        ]
+      },
+      {
+        heading: '2. Temel Haklarınız',
+        text: [
+          '• Hizmetten Adalet ve Hakkaniyete Uygun Faydalanma: Irk, dil, din, cinsiyet ayrımı gözetilmeksizen eşit ve nitelikli tıbbi bakım alma hakkı.',
+          '• Bilgilendirilme ve Rıza (Aydınlatılmış Onam) Hakkı: Sağlık durumunuz, tanı, önerilen cerrahi/medikal tedavi seçenekleri, olası riskler ve alternatifler hakkında anlaşılır dille bilgilendirilme ve özgür iradenizle karar verme hakkı.',
+          '• Mahremiyet ve Gizlilik Hakkı: Tıbbi muayene, teşhis ve tedavi süreçlerinin mahremiyet içerisinde yürütülmesi, kişisel sağlık verilerinizin gizli tutulması hakkı.',
+          '• Dini Vecibeleri Yerine Getirebilme ve Saygınlık Görme: İnsani değerlere uygun, saygılı, güler yüzlü ve nazik bir ortamda tedavi görme hakkı.'
+        ]
+      },
+      {
+        heading: '3. İletişim ve Geri Bildirim Süreçleri',
+        text: [
+          'Kliniğimizle web sitemiz, telefon numaralarımız veya WhatsApp hatlarımız üzerinden iletişime geçtiğinizde, soru ve randevu talepleriniz Hasta Hakları ilkeleri göz önünde bulundurularak en kısa sürede yanıtlanır.',
+          'Hasta hakları konusundaki görüş, öneri ve taleplerinizi info@drekremyalcin.com.tr adresi üzerinden kliniğimize iletebilirsiniz.'
+        ]
+      }
+    ]
+  }
+};
+
 export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isBioModalOpen, setIsBioModalOpen] = useState(false);
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
   const [isCertGalleryModalOpen, setIsCertGalleryModalOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const [selectedLegalDoc, setSelectedLegalDoc] = useState<LegalDocument | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+  const [formCooldown, setFormCooldown] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [activeCertIndex, setActiveCertIndex] = useState(0);
   const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
   const [activeContentKey, setActiveContentKey] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [videoSearchQuery, setVideoSearchQuery] = useState('');
+  const [isMapInView, setIsMapInView] = useState(false);
+  const mapContainerRef = React.useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile, { passive: true });
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const cardHover = isMobile ? {} : { y: -8, scale: 1.01 };
+  const cardHoverHigh = isMobile ? {} : { y: -10, scale: 1.02 };
+  const videoCardHover = isMobile ? {} : { y: -10 };
+  const navHoverRight = isMobile ? {} : { x: 10 };
+
+  const animAboutImage = {
+    initial: isMobile ? { opacity: 0 } : { opacity: 0, scale: 0.95 },
+    whileInView: isMobile ? { opacity: 1 } : { opacity: 1, scale: 1 },
+    viewport: { once: true },
+    transition: { duration: 0.5 }
+  };
+
+  const animAboutText = {
+    initial: isMobile ? { opacity: 0 } : { opacity: 0, x: 30 },
+    whileInView: isMobile ? { opacity: 1 } : { opacity: 1, x: 0 },
+    viewport: { once: true },
+    transition: { duration: 0.5 }
+  };
+
+  const animSpecialtyCard = {
+    initial: isMobile ? { opacity: 0 } : { opacity: 0, y: 20 },
+    whileInView: isMobile ? { opacity: 1 } : { opacity: 1, y: 0 },
+    viewport: { once: true },
+    transition: { type: "tween", ease: "easeOut", duration: 0.3 }
+  };
 
   // Google Analytics Event Tracking Helper
   const trackGAEvent = (category: string, action: string, label: string) => {
@@ -119,15 +318,6 @@ export default function App() {
           scrollCerts('right');
         }
       }
-      // Videos
-      if (videoScrollRef.current && !isGalleryModalOpen) {
-        const { scrollLeft, scrollWidth, clientWidth } = videoScrollRef.current;
-        if (scrollLeft + clientWidth >= scrollWidth - 20) {
-          videoScrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
-        } else {
-          scrollVideos('right');
-        }
-      }
     }, 4000); // Increased interval for better performance
 
     return () => {
@@ -148,12 +338,13 @@ export default function App() {
     isMobileMenuOpen, 
     isAppointmentModalOpen, 
     selectedCert, 
-    activeContentKey
+    activeContentKey,
+    selectedLegalDoc
   ]);
 
   // Lock body scroll when full-screen modals are open to prevent double scrollbars
   useEffect(() => {
-    if (isGalleryModalOpen || isCertGalleryModalOpen || !!selectedVideo) {
+    if (isGalleryModalOpen || isCertGalleryModalOpen || !!selectedVideo || !!selectedLegalDoc) {
       document.body.style.setProperty('overflow', 'hidden', 'important');
       document.documentElement.style.setProperty('overflow', 'hidden', 'important');
     } else {
@@ -164,13 +355,37 @@ export default function App() {
       document.body.style.removeProperty('overflow');
       document.documentElement.style.removeProperty('overflow');
     };
-  }, [isGalleryModalOpen, isCertGalleryModalOpen, selectedVideo]);
+  }, [isGalleryModalOpen, isCertGalleryModalOpen, selectedVideo, selectedLegalDoc]);
+
+  // Lazy load Google Maps when container is near viewport
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+      setIsMapInView(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting) {
+          setIsMapInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '300px' } // Load 300px before reaching the viewport
+    );
+    if (mapContainerRef.current) {
+      observer.observe(mapContainerRef.current);
+    }
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   const navLinks: NavLink[] = [
     { name: 'Anasayfa', href: '#home' },
     { name: 'Hakkında', href: '#about' },
     { 
-      name: 'Tedaviler & Cerrahi', 
+      name: 'Tedaviler', 
       href: '#',
       dropdown: [
         {
@@ -189,7 +404,7 @@ export default function App() {
       ]
     },
     { 
-      name: 'Hastalıklar & Bilgilendirme', 
+      name: 'Hastalıklar', 
       href: '#',
       dropdown: [
         {
@@ -210,7 +425,51 @@ export default function App() {
         }
       ]
     },
-    { name: 'Video Galeri', href: '#gallery' },
+    { 
+      name: 'Fonksiyonel Tıp & Longevity', 
+      href: '#',
+      dropdown: [
+        {
+          title: 'Hizmetler & Protokoller',
+          items: [
+            { name: 'Kronik Hastalık Yönetimi', slug: 'kronik-hastalik-yonetimi' },
+            { name: 'Hücresel Sağlık ve Yaşlanma Karşıtı Protokoller', slug: 'hucresel-saglik-ve-yaslanma-karsiti-protokoller' },
+            { name: 'Kişiselleştirilmiş Beslenme ve Detoks Programları', slug: 'kisisellestirilmis-beslenme-ve-detoks-programlari' },
+            { name: 'Hormonal Denge Analizi', slug: 'hormonal-denge-analizi' }
+          ]
+        }
+      ]
+    },
+    { 
+      name: 'Medikal Estetik', 
+      href: '#',
+      dropdown: [
+        {
+          title: 'Uygulamalar & Tedaviler',
+          items: [
+            { name: 'Ameliyatsız Cilt Gençleştirme Uygulamaları', slug: 'ameliyatsiz-cilt-genclestirme-uygulamalari' },
+            { name: 'Mezoterapi ve PRP Tedavileri', slug: 'mezoterapi-ve-prp-tedavileri' },
+            { name: 'Leke ve Akne Skarları Yönetimi', slug: 'leke-ve-akne-skarlari-yonetimi' },
+            { name: 'Bölgesel İnceltme ve Sıkılaşma', slug: 'bolgesel-inceltme-ve-sikilasma' }
+          ]
+        }
+      ]
+    },
+    { 
+      name: 'GETAT', 
+      href: '#',
+      dropdown: [
+        {
+          title: 'Tamamlayıcı Tıp Yöntemleri',
+          items: [
+            { name: 'Akupunktur Tedavisi', slug: 'akupunktur-tedavisi' },
+            { name: 'Ozon Terapi Uygulamaları', slug: 'ozon-terapi-uygulamalari' },
+            { name: 'Kupa Terapisi (Hacamat)', slug: 'kupa-terapisi-hacamat' },
+            { name: 'Fitoterapi (Bitkisel Tedavi) Danışmanlığı', slug: 'fitoterapi-bitkisel-tedavi-danismanligi' }
+          ]
+        }
+      ]
+    },
     { name: 'İletişim', href: '#contact' },
   ];
 
@@ -292,6 +551,15 @@ export default function App() {
     { id: 'v32', title: 'Bel Fıtığı Nasıl Teşhis Edilir?', youtubeUrl: 'https://www.youtube.com/embed/e0hBTZkQHmU', kucukResim: 'https://i.ytimg.com/vi/e0hBTZkQHmU/hqdefault.jpg' }
   ];
 
+  const medicalStockThumbnails = [
+    'https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=800&q=80', // Beyin MRI / Tomografi
+    'https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=800&q=80', // Ameliyathane & Mikrocerrahi
+    'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80', // Medikal Teşhis & Radyoloji
+    'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80', // Omurga & Tıp Teknolojisi
+    'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80', // Cerrahi Operasyon
+    'https://images.unsplash.com/photo-1530497610245-94d3c16cda28?auto=format&fit=crop&w=800&q=80', // Nöroloji & Sağlık Rehberi
+  ];
+
   const certificates: Certificate[] = [
     { id: 'c1', title: 'Sertifika 1', issuer: 'T.C. Sağlık Bakanlığı', year: '2024', image: 'https://i.ibb.co/BVpfDm13/Whats-App-mage-2026-04-06-at-10-06-29-1.jpg' },
     { id: 'c2', title: 'Sertifika 2', issuer: 'T.C. Sağlık Bakanlığı', year: '2024', image: 'https://i.ibb.co/RpBbyBXV/Whats-App-mage-2026-04-06-at-10-06-29-2.jpg' },
@@ -319,22 +587,11 @@ export default function App() {
   ];
 
   const certScrollRef = React.useRef<HTMLDivElement>(null);
-  const videoScrollRef = React.useRef<HTMLDivElement>(null);
 
   const scrollCerts = (direction: 'left' | 'right') => {
     if (certScrollRef.current) {
       const scrollAmount = 280; // Item width (240px) + gap (40px)
       certScrollRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      });
-    }
-  };
-
-  const scrollVideos = (direction: 'left' | 'right') => {
-    if (videoScrollRef.current) {
-      const scrollAmount = 400;
-      videoScrollRef.current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth'
       });
@@ -402,21 +659,21 @@ export default function App() {
       </div>
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/40 backdrop-blur-xl py-3 border-b border-gold/20' : 'bg-transparent py-6'}`}>
-        <div className="max-w-7xl mx-auto px-4 md:px-8 h-24 flex items-center justify-between">
-          <div className="flex items-center gap-4 lg:gap-6 xl:gap-12">
-            <div className="flex items-center gap-2 cursor-pointer" onClick={() => {
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-24 flex items-center justify-between">
+          <div className="flex items-center gap-2 lg:gap-3 xl:gap-5">
+            <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => {
               setActiveContentKey(null);
               window.scrollTo(0, 0);
             }}>
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-gold rounded-full flex items-center justify-center">
-                <Brain className="text-dark-stitch w-5 h-5 md:w-6 md:h-6 animate-logo-dual" />
+              <div className="w-9 h-9 md:w-10 md:h-10 bg-gold rounded-full flex items-center justify-center aspect-square shrink-0 overflow-hidden p-1.5">
+                <Brain className="text-dark-stitch w-full h-full object-contain animate-logo-dual" />
               </div>
               <div className="flex flex-col">
-                <span className="text-lg md:text-xl font-serif font-bold tracking-tight text-white leading-none">EKREM YALÇIN</span>
-                <span className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-gold font-medium">Dr. Öğretim Üyesi</span>
+                <span className="text-base md:text-lg font-serif font-bold tracking-tight text-white leading-none">EKREM YALÇIN</span>
+                <span className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-gold font-medium">Dr. Öğretim Üyesi</span>
               </div>
             </div>
-            <div className="hidden lg:flex items-center lg:gap-4 xl:gap-8">
+            <div className="hidden lg:flex items-center lg:gap-2.5 xl:gap-4">
               {navLinks.map((link) => (
                 <div 
                   key={link.name} 
@@ -435,10 +692,10 @@ export default function App() {
                         setOpenDropdown(openDropdown === link.name ? null : link.name);
                       }
                     }}
-                    className={`text-[11px] xl:text-xs font-semibold tracking-widest uppercase transition-colors flex items-center gap-1.5 ${openDropdown === link.name ? 'text-gold' : 'text-white/50 hover:text-gold'}`}
+                    className={`text-[10px] xl:text-[11px] font-bold tracking-wider uppercase transition-colors inline-flex items-center gap-1.5 w-auto whitespace-nowrap shrink-0 ${openDropdown === link.name ? 'text-gold' : 'text-white/50 hover:text-gold'}`}
                   >
-                    {link.name}
-                    {link.dropdown && <ChevronDown className="w-3 h-3 opacity-50 shrink-0 self-center" />}
+                    <span>{link.name}</span>
+                    {link.dropdown && <ChevronDown className="w-2.5 h-2.5 opacity-60 shrink-0" />}
                   </a>
                   
                   {link.dropdown && (
@@ -478,7 +735,7 @@ export default function App() {
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-2 md:gap-4 ml-4 lg:ml-6 xl:ml-12 shrink-0">
+          <div className="flex items-center gap-2 md:gap-3 ml-2 lg:ml-3 xl:ml-6 shrink-0">
             <a 
               href="https://www.instagram.com/dr_ekremyalcin06/" 
               target="_blank" 
@@ -544,13 +801,13 @@ export default function App() {
                           window.scrollTo(0, 0);
                         }
                       }}
-                      className="text-3xl font-serif font-bold text-white/80 hover:text-gold flex items-center justify-between group min-h-[44px]"
+                      className="text-2xl sm:text-3xl font-serif font-bold text-white/80 hover:text-gold inline-flex items-center gap-2.5 w-auto group min-h-[44px]"
                     >
                       <span>{link.name}</span>
                       {link.dropdown ? (
-                        <ChevronDown className="w-6 h-6 text-gold/50" />
+                        <ChevronDown className="w-5 h-5 text-gold/60 shrink-0" />
                       ) : (
-                        <ArrowRight className="w-6 h-6 text-gold/0 group-hover:text-gold transition-all" />
+                        <ArrowRight className="w-5 h-5 text-gold/0 group-hover:text-gold transition-all shrink-0" />
                       )}
                     </motion.a>
                     
@@ -611,7 +868,7 @@ export default function App() {
                       setIsMobileMenuOpen(false);
                       setIsAppointmentModalOpen(true);
                     }} 
-                    className="premium-button w-full justify-center min-h-[50px] text-lg"
+                    className="premium-button w-full justify-center min-h-[50px]"
                   >
                     Randevu Al
                   </motion.button>
@@ -626,13 +883,22 @@ export default function App() {
       </nav>
 
       {activeContentKey ? (
-        <ContentPage 
-          contentKey={activeContentKey} 
-          onBack={() => {
-            setActiveContentKey(null);
-            window.scrollTo(0, 0);
-          }} 
-        />
+        <React.Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center bg-dark-stitch text-gold font-serif">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-10 h-10 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+              <span className="text-xs uppercase tracking-widest text-gold/80">İçerik Yükleniyor...</span>
+            </div>
+          </div>
+        }>
+          <ContentPage 
+            contentKey={activeContentKey} 
+            onBack={() => {
+              setActiveContentKey(null);
+              window.scrollTo(0, 0);
+            }} 
+          />
+        </React.Suspense>
       ) : (
         <main>
         {/* Hero Section */}
@@ -669,12 +935,12 @@ export default function App() {
           <div className="light-beam top-0 left-3/4 opacity-20" />
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-gold/5 to-transparent pointer-events-none" />
           
-          <div className="relative z-10 max-w-7xl mx-auto px-8 w-full py-20">
+          <div className="relative z-10 max-w-7xl mx-auto px-8 w-full py-10">
             <div className="grid lg:grid-cols-12 gap-12 items-center">
               <motion.div 
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 1, delay: 0.2 }}
+                initial={isMobile ? { opacity: 0 } : { opacity: 0, x: -50 }}
+                animate={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                transition={{ duration: isMobile ? 0.5 : 1, delay: isMobile ? 0.1 : 0.2 }}
                 className="lg:col-span-6"
               >
                 <div className="flex items-center gap-4 mb-8">
@@ -685,7 +951,7 @@ export default function App() {
                 </div>
                 
                 <h1 className="text-5xl sm:text-6xl md:text-8xl font-serif leading-[1.1] mb-6 premium-text-gradient tracking-tight">
-                  Prestijli <br className="hidden sm:block" />
+                  Gelişmiş <br className="hidden sm:block" />
                   <span className="italic text-gold">Beyin Cerrahi</span> <br className="hidden sm:block" />
                   Çözümleri
                 </h1>
@@ -709,9 +975,9 @@ export default function App() {
               </motion.div>
 
               <motion.div
-                initial={{ opacity: 0, x: 50, scale: 0.9 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                transition={{ duration: 1, delay: 0.4 }}
+                initial={isMobile ? { opacity: 0 } : { opacity: 0, x: 50, scale: 0.9 }}
+                animate={isMobile ? { opacity: 1 } : { opacity: 1, x: 0, scale: 1 }}
+                transition={{ duration: isMobile ? 0.5 : 1, delay: isMobile ? 0.2 : 0.4 }}
                 className="lg:col-span-6 relative flex justify-end"
               >
                 <div className="relative group scale-100 sm:scale-105 lg:scale-[1.12] lg:translate-x-16 transition-transform duration-1000 origin-center lg:origin-right soft-glow-bg">
@@ -757,13 +1023,90 @@ export default function App() {
           </div>
         </section>
 
+        {/* Infinite Marquee Video Ticker Section */}
+        <section className="w-full py-10 md:py-14 relative z-20 overflow-hidden content-visibility-auto">
+          {/* Side Gradient Fade Masks for Seamless Edge Transitions */}
+          <div className="absolute top-0 bottom-0 left-0 w-12 sm:w-28 bg-gradient-to-r from-[#0a192f] to-transparent z-10 pointer-events-none" />
+          <div className="absolute top-0 bottom-0 right-0 w-12 sm:w-28 bg-gradient-to-l from-[#0a192f] to-transparent z-10 pointer-events-none" />
+
+          {/* Header Label & Action Bar */}
+          <div className="max-w-7xl mx-auto px-6 mb-6 md:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-2.5 h-2.5 rounded-full bg-gold shadow-[0_0_10px_#D4AF37] animate-pulse shrink-0" />
+              <div>
+                <h3 className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-gold/90">
+                  Öne Çıkan Video Bilgilendirmeleri
+                </h3>
+                <p className="text-[11px] sm:text-xs text-white/40 font-light tracking-wider mt-0.5">
+                  Videoları izlemek için kartların üzerine tıklayabilirsiniz
+                </p>
+              </div>
+            </div>
+
+            {/* Tüm Videoları İncele Button */}
+            <button 
+              onClick={() => setIsGalleryModalOpen(true)}
+              className="group relative px-5 py-2.5 rounded-full overflow-hidden transition-all duration-300 hover:shadow-[0_0_25px_rgba(212,175,55,0.4)] hover:scale-[1.03] active:scale-[0.98] border border-gold/40 bg-gold/10 backdrop-blur-sm self-start sm:self-auto shrink-0"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-gold/20 via-[#F5E6AD]/30 to-gold/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <span className="relative z-10 text-gold font-bold tracking-[0.15em] uppercase text-[11px] sm:text-xs flex items-center gap-2">
+                Tüm Videoları İncele ({videos.length} Video)
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </button>
+          </div>
+
+          {/* Marquee Infinite Loop Track */}
+          <div className="flex overflow-hidden select-none">
+            <div className="animate-marquee flex gap-5 px-2 hover:[animation-play-state:paused] active:[animation-play-state:paused]" style={{ willChange: "transform", transform: "translateZ(0)" }}>
+              {[...videos, ...videos].map((video, idx) => {
+                const isEven = idx % 2 === 0;
+                const stockImageIndex = Math.floor(idx / 2) % medicalStockThumbnails.length;
+                const thumbnailSrc = isEven ? medicalStockThumbnails[stockImageIndex] : video.kucukResim;
+
+                return (
+                  <div
+                    key={`marquee-${video.id}-${idx}`}
+                    onClick={() => setSelectedVideo(video)}
+                    className="w-64 sm:w-80 shrink-0 group cursor-pointer glass-card p-3 rounded-2xl border border-gold/20 hover:border-gold/60 transition-all duration-300 bg-[#0a192f]/80 backdrop-blur-sm flex flex-col gap-2.5 shadow-sm hover:shadow-[0_0_25px_rgba(212,175,55,0.25)] relative overflow-hidden"
+                  >
+                    {/* Thumbnail Container */}
+                    <div className="aspect-video rounded-xl overflow-hidden relative border border-gold/15 bg-black/40">
+                      <img
+                        src={thumbnailSrc}
+                        alt={video.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        referrerPolicy="no-referrer"
+                        loading="lazy"
+                        fetchPriority="low"
+                        decoding="async"
+                      />
+                      {/* Play Button Overlay */}
+                      <div className="absolute inset-0 bg-black/35 group-hover:bg-black/15 transition-colors flex items-center justify-center">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gold/90 text-dark-stitch flex items-center justify-center group-hover:scale-110 group-hover:bg-gold transition-all duration-300 shadow-[0_0_15px_rgba(212,175,55,0.6)]">
+                          <Play className="w-4 h-4 fill-current ml-0.5" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Video Title */}
+                    <div className="px-1 pb-1">
+                      <h4 className="text-xs sm:text-sm font-serif font-medium text-white/90 group-hover:text-gold transition-colors line-clamp-2 leading-snug">
+                        {video.title}
+                      </h4>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
         {/* About Section */}
-        <section id="about" className="py-20 relative tech-pattern" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
-          <div className="max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-32 items-center">
+        <section id="about" className="py-12 relative tech-pattern" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
+          <div className="max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-16 items-center">
             <motion.div 
-              whileInView={{ opacity: 1, scale: 1 }}
-              initial={{ opacity: 0, scale: 0.95 }}
-              viewport={{ once: true }}
+              {...animAboutImage}
               className="relative group"
             >
               <div className="relative z-10 aspect-[4/5] rounded-sm overflow-hidden border border-gold/30 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
@@ -784,13 +1127,11 @@ export default function App() {
             </motion.div>
 
             <motion.div
-              whileInView={{ opacity: 1, x: 0 }}
-              initial={{ opacity: 0, x: 30 }}
-              viewport={{ once: true }}
+              {...animAboutText}
             >
-              <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-4 block">Dr. Ekrem Yalçın Kimdir?</span>
-              <h2 className="text-5xl md:text-6xl font-serif mb-6 leading-tight">Akademik Birikim ve <span className="text-gold">Cerrahi Hassasiyet</span></h2>
-              <div className="space-y-4 text-white/50 text-lg leading-relaxed mb-8 font-light">
+              <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-3 block">Dr. Ekrem Yalçın Kimdir?</span>
+              <h2 className="text-5xl md:text-6xl font-serif mb-4 leading-tight">Akademik Birikim ve <span className="text-gold">Cerrahi Hassasiyet</span></h2>
+              <div className="space-y-4 text-white/50 text-lg leading-relaxed mb-6 font-light">
                 <p>
                   Op. Dr. Ekrem YALÇIN, 1967 yılında Konya’nın Kulu ilçesinde doğmuştur. 1991 yılında Selçuk Üniversitesi Tıp Fakültesi’nden mezun olmuş, 2001 yılında İzmir SSK Eğitim ve Araştırma Hastanesi’nde uzmanlık eğitimini tamamlayarak Beyin ve Sinir Cerrahisi Uzmanı unvanını almıştır.
                 </p>
@@ -798,13 +1139,13 @@ export default function App() {
                   Rize, Trabzon, Ankara ve Van illerinde çeşitli hastanelerde Beyin, Omurilik ve Sinir Cerrahisi Uzmanı ve Başhekim olarak görev yapmıştır. Halen Ankara Medipol Üniversitesi Tıp Fakültesi Beyin, Omurilik ve Sinir Cerrahisi Anabilim Dalı’nda Doktor Öğretim Üyesi olarak görevine devam etmektedir.
                 </p>
               </div>
-              <div className="grid grid-cols-2 gap-12 mb-8">
+              <div className="grid grid-cols-2 gap-12 mb-6">
                 <div>
                   <div className="text-4xl font-serif text-gold mb-1">20+</div>
                   <div className="text-xs tracking-widest uppercase text-white/30">Yıllık Deneyim</div>
                 </div>
                 <div>
-                  <div className="text-4xl font-serif text-gold mb-1">5000+</div>
+                  <div className="text-4xl font-serif text-gold mb-1">10000+</div>
                   <div className="text-xs tracking-widest uppercase text-white/30">Başarılı Operasyon</div>
                 </div>
               </div>
@@ -819,26 +1160,23 @@ export default function App() {
         </section>
 
         {/* Specialties Section - Simplified to 2 Large Category Cards */}
-        <section id="specialties" className="py-16 relative overflow-hidden" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
+        <section id="specialties" className="py-10 relative overflow-hidden" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
           <div className="max-w-4xl mx-auto px-8">
-            <div className="flex flex-col items-center text-center mb-12">
+            <div className="flex flex-col items-center text-center mb-6">
               <span className="text-gold font-bold tracking-[0.4em] uppercase text-[10px] mb-4">Hizmetlerimiz</span>
               <h2 className="text-3xl md:text-5xl font-serif premium-text-gradient pulsing-headline">Uzmanlık Alanları</h2>
               <div className="h-px w-16 bg-gold/30 mt-6" />
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Card 1: TEDAVİLER & CERRAHİ */}
+              {/* Card 1: TEDAVİLER */}
               <motion.div 
-                whileHover={{ y: -8, scale: 1.01 }}
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                whileHover={cardHover}
                 style={{ willChange: "transform" }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                {...animSpecialtyCard}
                 onClick={() => {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
-                  setTimeout(() => setOpenDropdown('Tedaviler & Cerrahi'), 500);
+                  setTimeout(() => setOpenDropdown('Tedaviler'), 500);
                 }}
                 className="glass-card p-8 rounded-sm text-center flex flex-col items-center gap-6 group border-gold/20 hover:border-gold/60 transition-all duration-500 cursor-pointer relative overflow-hidden rotating-border-glow"
               >
@@ -846,7 +1184,7 @@ export default function App() {
                   <Stethoscope className="w-8 h-8" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-serif font-bold tracking-tight text-white group-hover:text-gold transition-colors uppercase">TEDAVİLER & CERRAHİ</h3>
+                  <h3 className="text-xl font-serif font-bold tracking-tight text-white group-hover:text-gold transition-colors uppercase">TEDAVİLER</h3>
                   <p className="text-white/40 text-[10px] font-light tracking-widest uppercase">Beyin, Omurilik ve Sinir Cerrahisi Ameliyatları</p>
                 </div>
                 <div className="w-8 h-px bg-gold/20 group-hover:w-16 group-hover:bg-gold transition-all duration-500" />
@@ -856,17 +1194,14 @@ export default function App() {
                 </div>
               </motion.div>
 
-              {/* Card 2: HASTALIKLAR & BİLGİLENDİRME */}
+              {/* Card 2: HASTALIKLAR */}
               <motion.div 
-                whileHover={{ y: -8, scale: 1.01 }}
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                whileHover={cardHover}
                 style={{ willChange: "transform" }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                {...animSpecialtyCard}
                 onClick={() => {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
-                  setTimeout(() => setOpenDropdown('Hastalıklar & Bilgilendirme'), 500);
+                  setTimeout(() => setOpenDropdown('Hastalıklar'), 500);
                 }}
                 className="glass-card p-8 rounded-sm text-center flex flex-col items-center gap-6 group border-gold/20 hover:border-gold/60 transition-all duration-500 cursor-pointer relative overflow-hidden rotating-border-glow"
               >
@@ -874,7 +1209,7 @@ export default function App() {
                   <Brain className="w-8 h-8" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-serif font-bold tracking-tight text-white group-hover:text-gold transition-colors uppercase">HASTALIKLAR & BİLGİLENDİRME</h3>
+                  <h3 className="text-xl font-serif font-bold tracking-tight text-white group-hover:text-gold transition-colors uppercase">HASTALIKLAR</h3>
                   <p className="text-white/40 text-[10px] font-light tracking-widest uppercase">Omurga, Boyun, Bel Sağlığı ve Tanı Kılavuzları</p>
                 </div>
                 <div className="w-8 h-px bg-gold/20 group-hover:w-16 group-hover:bg-gold transition-all duration-500" />
@@ -887,103 +1222,17 @@ export default function App() {
           </div>
         </section>
 
-        {/* Video Gallery Section */}
-        <section id="gallery" className="py-20 relative overflow-hidden" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
-          {/* Section Glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gold/5 blur-[150px] pointer-events-none" />
-          
-          <div className="max-w-7xl mx-auto px-8 relative z-10">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-              <div>
-                <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-6 block">Görsel Arşiv</span>
-                <h2 className="text-5xl md:text-6xl font-serif premium-text-gradient">Video Galeri</h2>
-                <p className="mt-6 text-white/40 text-lg font-light max-w-xl">
-                  Tedavi süreçleri, cerrahi teknikler ve hasta bilgilendirme videolarımızdan oluşan geniş arşivimiz.
-                </p>
-              </div>
-              <div className="flex gap-4">
-                <button 
-                  onClick={() => scrollVideos('left')}
-                  className="p-5 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-dark-stitch hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-500 group bg-white/5 backdrop-blur-sm"
-                >
-                  <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
-                </button>
-                <button 
-                  onClick={() => scrollVideos('right')}
-                  className="p-5 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-dark-stitch hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-500 group bg-white/5 backdrop-blur-sm"
-                >
-                  <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </div>
-            </div>
-            
-            <div 
-              ref={videoScrollRef}
-              className="flex gap-8 overflow-x-auto pb-12 no-scrollbar snap-x snap-mandatory"
-              style={{ willChange: "transform, scroll-position", transform: "translate3d(0,0,0)", WebkitOverflowScrolling: "touch" }}
-            >
-              {videos.slice(0, 6).map((video) => (
-                <motion.div 
-                  key={video.id} 
-                  whileHover={{ y: -10 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  style={{ willChange: "transform" }}
-                  onClick={() => setSelectedVideo(video)}
-                  className="min-w-[300px] md:min-w-[400px] snap-start group cursor-pointer"
-                >
-                  <div className="relative aspect-video rounded-sm overflow-hidden border border-gold/20 shadow-2xl">
-                    <img 
-                      src={video.kucukResim} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out sharp-image"
-                      style={{ willChange: "transform" }}
-                      alt={video.title}
-                      referrerPolicy="no-referrer"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <div className="play-icon-overlay">
-                      <div className="play-icon-circle scale-75 group-hover:scale-100 transition-transform duration-500">
-                        <Play className="w-8 h-8 fill-gold" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-6">
-                    <h4 className="text-xl font-serif text-gold font-bold tracking-tight group-hover:translate-x-2 transition-transform duration-500">
-                      {video.title}
-                    </h4>
-                    <div className="h-px w-12 bg-gold/30 mt-4 group-hover:w-full transition-all duration-700" />
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            <div className="mt-16 flex justify-center">
-              <button 
-                onClick={() => setIsGalleryModalOpen(true)}
-                className="group relative px-10 py-5 rounded-full overflow-hidden transition-all duration-500 hover:shadow-[0_0_50px_rgba(212,175,55,0.6)] hover:scale-[1.05]"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-gold via-[#F5E6AD] to-gold animate-gradient-x" />
-                <div className="absolute inset-[2px] bg-dark-stitch rounded-full group-hover:bg-transparent transition-colors duration-500" />
-                <span className="relative z-10 text-gold group-hover:text-dark-stitch font-bold tracking-[0.2em] uppercase text-xs flex items-center gap-3">
-                  Tüm Videoları İncele (32 Video)
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </button>
-            </div>
-          </div>
-        </section>
-
         {/* Certificates Section */}
         <section id="certificates" className="py-10 overflow-hidden relative" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
           {/* Subtle Glow for Certificates Section */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gold/5 rounded-full blur-[120px] pointer-events-none opacity-30" />
           
           <div className="max-w-7xl mx-auto px-8 relative z-10">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-8">
               <div className="max-w-2xl">
-                <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-6 block">Başarılarımız</span>
+                <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-4 block">Başarılarımız</span>
                 <h2 className="text-5xl md:text-6xl font-serif premium-text-gradient leading-tight">Uluslararası Başarılar ve <span className="italic text-gold/80">Sertifikalar</span></h2>
-                <p className="mt-8 text-white/40 text-lg font-light leading-relaxed antialiased">
+                <p className="mt-4 text-white/40 text-lg font-light leading-relaxed antialiased">
                   Tıbbi mükemmeliyet yolculuğumuzda kazandığımız uluslararası geçerliliğe sahip yetki belgeleri ve uzmanlık sertifikaları.
                 </p>
               </div>
@@ -1012,13 +1261,13 @@ export default function App() {
               {certificates.map((cert) => (
                 <motion.div 
                   key={cert.id} 
-                  whileHover={{ y: -10 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  whileHover={videoCardHover}
+                  transition={{ type: "tween", ease: "easeOut", duration: 0.3 }}
                   style={{ willChange: "transform" }}
                   onClick={() => setSelectedCert(cert)}
                   className="min-w-[200px] md:min-w-[240px] snap-start group cursor-pointer"
                 >
-                  <div className="relative aspect-[4/5] rounded-sm overflow-hidden border border-gold/30 shadow-[0_40px_80px_rgba(0,0,0,0.6)] bg-white mb-8 group-hover:border-gold transition-all duration-500">
+                  <div className="relative aspect-[4/5] rounded-sm overflow-hidden border border-gold/30 shadow-[0_40px_80px_rgba(0,0,0,0.6)] bg-white mb-4 group-hover:border-gold transition-all duration-500">
                     <img 
                       src={cert.image} 
                       alt={cert.title} 
@@ -1026,6 +1275,7 @@ export default function App() {
                       style={{ willChange: "transform, filter" }}
                       referrerPolicy="no-referrer"
                       loading="lazy"
+                      fetchPriority="low"
                       decoding="async"
                     />
                     
@@ -1056,7 +1306,7 @@ export default function App() {
               ))}
             </div>
             
-            <div className="mt-12 flex flex-col items-center gap-12">
+            <div className="mt-6 flex flex-col items-center gap-6">
               <div className="flex gap-3">
                 {certificates.map((_, i) => (
                   <div key={i} className={`h-1.5 rounded-full transition-all duration-500 ${i === activeCertIndex ? 'w-12 bg-gold shadow-[0_0_10px_rgba(212,175,55,0.5)]' : 'w-2 bg-white/10'}`} />
@@ -1079,23 +1329,23 @@ export default function App() {
         </section>
 
         {/* Contact Section */}
-        <section id="contact" className="pt-40 pb-2 relative overflow-hidden" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
+        <section id="contact" className="pt-16 pb-2 relative overflow-hidden" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
           {/* Premium Subtle Gold Glows - Light, not color */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-gold/5 rounded-full blur-[150px] pointer-events-none opacity-50" />
           <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-gold/3 rounded-full blur-[100px] pointer-events-none" />
           <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-gold/3 rounded-full blur-[100px] pointer-events-none" />
           
           <div className="max-w-7xl mx-auto px-8 relative z-10">
-            <div className="flex flex-col items-center text-center mb-24">
+            <div className="flex flex-col items-center text-center mb-10">
               <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-6 block">İletişim</span>
               <h2 className="text-5xl md:text-6xl font-serif mb-8 premium-text-gradient">Sağlığınız İçin <br />Bizimle <span className="text-gold">İletişime Geçin</span></h2>
               <div className="h-px w-24 bg-gold/30 mt-4 mx-auto" />
             </div>
             
-            <div className="grid md:grid-cols-3 gap-6 mb-24 max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-6 mb-10 max-w-6xl mx-auto">
               {/* Address Card */}
               <motion.div 
-                whileHover={{ y: -10, scale: 1.02 }}
+                whileHover={cardHoverHigh}
                 className="glass-card p-12 rounded-sm border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden"
               >
                 {/* Subtle Card Glow */}
@@ -1114,7 +1364,7 @@ export default function App() {
 
               {/* Phone Card */}
               <motion.div 
-                whileHover={{ y: -10, scale: 1.02 }}
+                whileHover={cardHoverHigh}
                 className="glass-card p-12 rounded-sm border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden"
               >
                 {/* Subtle Card Glow */}
@@ -1144,7 +1394,7 @@ export default function App() {
 
               {/* Email Card */}
               <motion.div 
-                whileHover={{ y: -10, scale: 1.02 }}
+                whileHover={cardHoverHigh}
                 className="glass-card p-12 rounded-sm border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden"
               >
                 {/* Subtle Card Glow */}
@@ -1155,11 +1405,11 @@ export default function App() {
                 </div>
                 <h5 className="text-gold font-bold uppercase tracking-widest text-[10px] mb-6">E-posta</h5>
                 <a 
-                  href="mailto:info@drekremyalcin.com" 
-                  onClick={() => trackGAEvent('Contact', 'Email Click', 'info@drekremyalcin.com')}
+                  href="mailto:info@drekremyalcin.com.tr" 
+                  onClick={() => trackGAEvent('Contact', 'Email Click', 'info@drekremyalcin.com.tr')}
                   className="text-white/70 hover:text-gold transition-colors text-sm font-medium tracking-wide"
                 >
-                  info@drekremyalcin.com
+                  info@drekremyalcin.com.tr
                 </a>
               </motion.div>
             </div>
@@ -1181,14 +1431,14 @@ export default function App() {
         </section>
 
         {/* Locations Section */}
-        <section id="locations" className="pt-2 pb-20 relative overflow-hidden border-t border-white/5" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
+        <section id="locations" className="pt-2 pb-10 relative overflow-hidden border-t border-white/5" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
           <div className="max-w-7xl mx-auto px-8 relative z-10">
             <div className="flex flex-col md:flex-row justify-between items-end mb-2 gap-8">
               <div>
                 <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-[2px] block">Ulaşım</span>
-                <h2 className="text-5xl md:text-6xl font-serif premium-text-gradient">Lokasyonlarımız</h2>
+                <h2 className="text-5xl md:text-6xl font-serif premium-text-gradient">Lokasyonumuz</h2>
                 <p className="mt-0 text-white/40 text-lg font-light max-w-xl">
-                  Ankara'nın merkezi noktalarında, en ileri teknolojik donanımlara sahip hastanelerimizde hizmetinizdeyiz.
+                  Ankara'nın merkezi noktasında, en ileri teknolojik donanımlara sahip hastanemizde hizmetinizdeyiz.
                 </p>
               </div>
             </div>
@@ -1199,7 +1449,7 @@ export default function App() {
                 {locations.map((loc) => (
                   <motion.div 
                     key={loc.id}
-                    whileHover={{ x: 10 }}
+                    whileHover={navHoverRight}
                     className="glass-card p-8 rounded-sm border-gold/20 hover:border-gold/60 transition-all duration-500 group relative overflow-hidden h-full flex flex-col"
                   >
                     <div className="absolute top-0 left-0 w-1 h-full bg-gold/0 group-hover:bg-gold transition-all duration-500" />
@@ -1234,14 +1484,24 @@ export default function App() {
               </div>
 
               {/* Map Container */}
-              <div className="lg:col-span-8 h-[400px] lg:h-[450px] rounded-lg overflow-hidden border-2 border-gold shadow-[0_0_40px_rgba(212,175,55,0.25)] relative">
-                <iframe
-                  src="https://maps.google.com/maps?q=Gayret,%20%C4%B0vedik%20Cd.%20No:41,%2006170%20Yenimahalle/Ankara,%20T%C3%BCrkiye%20%C3%96zel%20Ortado%C4%9Fu%20Hastanesi&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                  className="w-full h-full border-0"
-                  allowFullScreen
-                  loading="lazy"
-                  title="Özel Ortadoğu Hastanesi Haritası"
-                />
+              <div ref={mapContainerRef} className="lg:col-span-8 h-[400px] lg:h-[450px] rounded-lg overflow-hidden border-2 border-gold shadow-[0_0_40px_rgba(212,175,55,0.25)] relative">
+                {isMapInView ? (
+                  <iframe
+                    src="https://maps.google.com/maps?q=Özel+Ortadoğu+Hastanesi+Yenimahalle+Ankara&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    className="w-full h-full border-0"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Özel Ortadoğu Hastanesi Haritası"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-dark-stitch text-white/50 text-sm gap-2">
+                    <span className="text-gold/80 animate-pulse font-serif uppercase tracking-widest text-xs">Harita Yükleniyor...</span>
+                  </div>
+                )}
                 
                 {/* Map Overlay for Premium Look */}
                 <div className="absolute inset-0 pointer-events-none border-[20px] border-dark-stitch/5" />
@@ -1253,14 +1513,14 @@ export default function App() {
       )}
 
       {/* Footer */}
-      <footer className="pt-32 pb-16 border-t border-white/5 relative overflow-hidden">
+      <footer className="pt-16 pb-8 border-t border-white/5 relative overflow-hidden">
         {/* Footer Glow - Subtle and soft */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-full bg-gold/5 blur-[150px] pointer-events-none opacity-40" />
         
         <div className="max-w-7xl mx-auto px-8 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-20 mb-24">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
             <div className="lg:col-span-1">
-              <div className="text-2xl font-serif font-bold tracking-tighter gold-text-gradient mb-8">
+              <div className="text-2xl font-serif font-bold tracking-tighter gold-text-gradient mb-4">
                 DR.EKREM YALÇIN <span className="text-white/30 font-light">| MEDICINE</span>
               </div>
               <p className="text-white/30 text-sm leading-relaxed font-light">
@@ -1269,79 +1529,120 @@ export default function App() {
             </div>
             
             <div>
-              <h4 className="text-xs font-bold tracking-[0.3em] uppercase text-gold mb-10">İletişim</h4>
-              <div className="space-y-6 text-white/40 text-sm">
-                <div className="flex items-start gap-4">
-                  <Phone className="w-5 h-5 text-gold/60 mt-1" />
+              <h4 className="text-xs font-bold tracking-[0.3em] uppercase text-gold mb-5">İletişim</h4>
+              <div className="space-y-4 text-white/40 text-sm">
+                <div className="flex items-start gap-3">
+                  <Phone className="w-5 h-5 text-gold/60 mt-0.5" />
                   <div>
-                    <div className="text-white/60 mb-1">Telefon</div>
+                    <div className="text-white/60 mb-0.5">Telefon</div>
                     <div className="font-medium">+90 507 233 94 97</div>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <Mail className="w-5 h-5 text-gold/60 mt-1" />
+                <div className="flex items-start gap-3">
+                  <Mail className="w-5 h-5 text-gold/60 mt-0.5" />
                   <div>
-                    <div className="text-white/60 mb-1">E-posta</div>
-                    <div className="font-medium">info@drekremyalcin.com</div>
+                    <div className="text-white/60 mb-0.5">E-posta</div>
+                    <div className="font-medium">info@drekremyalcin.com.tr</div>
                   </div>
                 </div>
               </div>
             </div>
             
             <div>
-              <h4 className="text-xs font-bold tracking-[0.3em] uppercase text-gold mb-10">Kurumsal</h4>
-              <ul className="space-y-4 text-white/40 text-sm">
-                <li><a href="#about" className="hover:text-gold transition-colors">Hakkımızda</a></li>
-                <li><a href="#" onClick={(e) => e.preventDefault()} className="hover:text-gold transition-colors">Kariyer</a></li>
-                <li><a href="#" onClick={(e) => e.preventDefault()} className="hover:text-gold transition-colors">Basın Kiti</a></li>
-                <li><a href="#" onClick={(e) => e.preventDefault()} className="hover:text-gold transition-colors">Gizlilik Politikası</a></li>
+              <h4 className="text-xs font-bold tracking-[0.3em] uppercase text-gold mb-5">Kurumsal & Yasal</h4>
+              <ul className="space-y-3 text-white/50 text-xs sm:text-sm">
+                <li>
+                  <button 
+                    onClick={() => setSelectedLegalDoc(legalDocuments.kvkk)}
+                    className="hover:text-gold transition-colors text-left flex items-center gap-2 group"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold/40 group-hover:bg-gold transition-colors shrink-0" />
+                    KVKK Aydınlatma Metni
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => setSelectedLegalDoc(legalDocuments.gizlilik)}
+                    className="hover:text-gold transition-colors text-left flex items-center gap-2 group"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold/40 group-hover:bg-gold transition-colors shrink-0" />
+                    Gizlilik ve Çerez Politikası
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => setSelectedLegalDoc(legalDocuments.yasal)}
+                    className="hover:text-gold transition-colors text-left flex items-center gap-2 group"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold/40 group-hover:bg-gold transition-colors shrink-0" />
+                    Yasal Uyarı & Tıbbi Sorumluluk Reddi
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => setSelectedLegalDoc(legalDocuments.hasta)}
+                    className="hover:text-gold transition-colors text-left flex items-center gap-2 group"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold/40 group-hover:bg-gold transition-colors shrink-0" />
+                    Hasta Hakları ve İletişim Aydınlatması
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => window.dispatchEvent(new Event('open-cookie-preferences'))}
+                    className="hover:text-gold transition-colors text-left flex items-center gap-2 group font-medium text-gold/80"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold group-hover:scale-125 transition-all shrink-0" />
+                    Çerez Tercihleri (Cookie Preferences)
+                  </button>
+                </li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-xs font-bold tracking-[0.3em] uppercase text-gold mb-10">Sosyal Medya</h4>
-              <div className="flex gap-4">
+              <h4 className="text-xs font-bold tracking-[0.3em] uppercase text-gold mb-5">Sosyal Medya</h4>
+              <div className="flex gap-3">
                 <a 
                   href="https://www.instagram.com/dr_ekremyalcin06/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   onClick={() => trackGAEvent('Social', 'Click', 'Footer Instagram')}
-                  className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-[#E4405F] hover:shadow-[0_0_15px_rgba(228,64,95,0.4)] hover:border-[#E4405F]/50 transition-all"
+                  className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-[#E4405F] hover:shadow-[0_0_15px_rgba(228,64,95,0.4)] hover:border-[#E4405F]/50 transition-all"
                 >
-                  <Instagram className="w-5 h-5" />
+                  <Instagram className="w-4 h-4" />
                 </a>
                 <a 
                   href="https://wa.me/905072339497?text=Merhaba%20Dr.%20Ekrem%20Bey%2C%20web%20siteniz%20uzerinden%20randevu%20talebi%20olusturmak%20istiyorum." 
                   target="_blank" 
                   rel="noopener noreferrer"
                   onClick={() => trackGAEvent('Contact', 'WhatsApp Click', 'Footer Social WhatsApp')}
-                  className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.4)] hover:border-[#25D366]/50 transition-all"
+                  className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.4)] hover:border-[#25D366]/50 transition-all"
                 >
-                  <MessageCircle className="w-5 h-5" />
+                  <MessageCircle className="w-4 h-4" />
                 </a>
                 <div 
-                  className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-[#1877F2]"
+                  className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-[#1877F2]"
                 >
-                  <Facebook className="w-5 h-5" />
+                  <Facebook className="w-4 h-4" />
                 </div>
                 <a 
                   href="https://www.youtube.com/@marcaworld01" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   onClick={() => trackGAEvent('Social', 'Click', 'Footer Youtube')}
-                  className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-[#FF0000] hover:shadow-[0_0_15px_rgba(255,0,0,0.4)] hover:border-[#FF0000]/50 transition-all"
+                  className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-[#FF0000] hover:shadow-[0_0_15px_rgba(255,0,0,0.4)] hover:border-[#FF0000]/50 transition-all"
                 >
-                  <Youtube className="w-5 h-5" />
+                  <Youtube className="w-4 h-4" />
                 </a>
               </div>
             </div>
           </div>
           
-          <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="pt-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="text-white/20 text-xs font-light tracking-widest uppercase text-center md:text-left">
               © 2026 DR. ÖĞR. ÜYESİ EKREM YALÇIN. TÜM HAKLARI SAKLIDIR. <span className="text-white/10">|</span> <span className="text-gold/40 hover:text-gold transition-colors font-medium cursor-default">Geliştirici: Yasin Yurt</span>
             </div>
-            <div className="flex gap-12">
+            <div className="flex gap-8">
               <a href="#" onClick={(e) => e.preventDefault()} className="text-white/20 text-[10px] uppercase tracking-[0.2em] hover:text-gold transition-colors">KVKK</a>
               <a href="#" onClick={(e) => e.preventDefault()} className="text-white/20 text-[10px] uppercase tracking-[0.2em] hover:text-gold transition-colors">Çerez Politikası</a>
               <a href="#" onClick={(e) => e.preventDefault()} className="text-white/20 text-[10px] uppercase tracking-[0.2em] hover:text-gold transition-colors">Yasal Uyarı</a>
@@ -1768,48 +2069,132 @@ export default function App() {
 
               <form 
                 className="space-y-6"
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  // Form verilerini al
-                  const form = e.target as HTMLFormElement;
-                  const name = (form.elements.namedItem('name') as HTMLInputElement).value;
-                  const date = (form.elements.namedItem('date') as HTMLInputElement).value;
-                  const note = (form.elements.namedItem('note') as HTMLTextAreaElement).value;
+                  if (isSubmittingForm || formCooldown) return;
 
-                  // WhatsApp Yönlendirme
-                  const doctorNumber = "905072339497"; // WhatsApp numarası
-                  const message = `Merhaba Dr. Ekrem Bey, web siteniz üzerinden randevu talebi oluşturmak istiyorum.%0A%0A*Ad Soyad:* ${name}%0A*Tercih Edilen Tarih:* ${date}%0A*Şikayet / Not:* ${note}`;
+                  setIsSubmittingForm(true);
+                  const form = e.target as HTMLFormElement;
+                  const rawName = (form.elements.namedItem('name') as HTMLInputElement).value;
+                  const rawDate = (form.elements.namedItem('date') as HTMLInputElement).value;
+                  const rawNote = (form.elements.namedItem('note') as HTMLTextAreaElement).value;
+
+                  // 1. Input Sanitization (XSS & Script Injection Prevention)
+                  const name = sanitizeForMessage(rawName);
+                  const date = sanitizeInput(rawDate);
+                  const note = sanitizeForMessage(rawNote);
+
+                  // 2. Execute reCAPTCHA v3 Bot Protection Token
+                  await executeRecaptcha('submit_appointment');
+
+                  // 3. WhatsApp Redirect URL Generation
+                  const doctorNumber = "905072339497";
+                  const message = `Merhaba Dr. Ekrem Bey, web siteniz üzerinden randevu talebi oluşturmak istiyorum.%0A%0A*Ad Soyad:* ${encodeURIComponent(name)}%0A*Tercih Edilen Tarih:* ${encodeURIComponent(date)}%0A*Şikayet / Not:* ${encodeURIComponent(note)}`;
                   const whatsappUrl = `https://wa.me/${doctorNumber}?text=${message}`;
                   
                   trackGAEvent('Appointment', 'Submit WhatsApp', name);
                   window.open(whatsappUrl, '_blank');
-                  setIsAppointmentModalOpen(false); // Gönderdikten sonra modalı kapat
+
+                  // 4. Rate Limiting / Debounce (3 Seconds Spam Protection)
+                  setFormCooldown(true);
+                  setTimeout(() => {
+                    setFormCooldown(false);
+                  }, 3000);
+
+                  setIsSubmittingForm(false);
+                  setIsAppointmentModalOpen(false);
                 }}
               >
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest text-gold font-bold">Ad Soyad</label>
-                  <input required name="name" type="text" className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 text-white focus:border-gold outline-none transition-all" placeholder="Adınız ve Soyadınız" />
+                  <input 
+                    required 
+                    name="name" 
+                    type="text" 
+                    onFocus={() => loadRecaptchaScript()}
+                    className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 text-white focus:border-gold outline-none transition-all" 
+                    placeholder="Adınız ve Soyadınız" 
+                  />
                 </div>
                 
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest text-gold font-bold">Tercih Edilen Tarih</label>
-                  <input required name="date" type="date" className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 text-white focus:border-gold outline-none transition-all" />
+                  <input 
+                    required 
+                    name="date" 
+                    type="date" 
+                    onFocus={() => loadRecaptchaScript()}
+                    className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 text-white focus:border-gold outline-none transition-all" 
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest text-gold font-bold">Şikayetiniz / Notunuz</label>
-                  <textarea required name="note" rows={4} className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 text-white focus:border-gold outline-none transition-all resize-none" placeholder="Lütfen şikayetinizi kısaca belirtiniz..."></textarea>
+                  <textarea 
+                    required 
+                    name="note" 
+                    rows={4} 
+                    onFocus={() => loadRecaptchaScript()}
+                    className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 text-white focus:border-gold outline-none transition-all resize-none" 
+                    placeholder="Lütfen şikayetinizi kısaca belirtiniz..."
+                  ></textarea>
                 </div>
 
-                <button type="submit" className="premium-button w-full mt-4 flex items-center justify-center gap-3">
-                  <MessageCircle className="w-5 h-5" />
-                  Randevu Talebini WhatsApp ile Gönder
+                <button 
+                  type="submit" 
+                  disabled={isSubmittingForm || formCooldown}
+                  className="premium-button w-full mt-4 flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                >
+                  {isSubmittingForm ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-dark-stitch border-t-transparent rounded-full animate-spin shrink-0" />
+                      <span>Güvenlik Kontrolü Yapılıyor...</span>
+                    </>
+                  ) : formCooldown ? (
+                    <>
+                      <Lock className="w-5 h-5 shrink-0" />
+                      <span>İşlem Alındı (Lütfen Bekleyin)</span>
+                    </>
+                  ) : (
+                    <>
+                      <MessageCircle className="w-5 h-5 shrink-0" />
+                      <span>Randevu Talebini WhatsApp ile Gönder</span>
+                    </>
+                  )}
                 </button>
+
+                {/* reCAPTCHA v3 & Privacy Protection Notice */}
+                <div className="pt-2 text-center text-[10px] text-white/40 flex items-center justify-center gap-1.5 leading-relaxed">
+                  <ShieldCheck className="w-3.5 h-3.5 text-gold/80 shrink-0" />
+                  <span>
+                    Bu form Google reCAPTCHA v3 ile korunmaktadır. 
+                    <button 
+                      type="button"
+                      onClick={() => setSelectedLegalDoc(legalDocuments.gizlilik)} 
+                      className="text-gold/80 hover:underline ml-1"
+                    >
+                      Gizlilik Politikası
+                    </button>
+                  </span>
+                </div>
               </form>
             </motion.div>
           </motion.div>
           )}
         </AnimatePresence>
+
+      {/* Cookie Consent Modal */}
+      <CookieConsent 
+        onOpenLegalDoc={(docKey) => setSelectedLegalDoc(legalDocuments[docKey])} 
+      />
+
+      {/* Legal Document Modal (Lazy Loaded) */}
+      <React.Suspense fallback={null}>
+        <LegalModal 
+          selectedLegalDoc={selectedLegalDoc} 
+          onClose={() => setSelectedLegalDoc(null)} 
+        />
+      </React.Suspense>
     </div>
   );
 }

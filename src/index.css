@@ -119,41 +119,50 @@
   }
 
   .rotating-border-glow::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 180%;
-    height: 180%;
-    /* Pre-feathered conic gradient reduces the need for high filter blur, saving significant GPU cycles */
-    background: conic-gradient(
-      from 0deg,
-      transparent 0deg,
-      transparent 120deg,
-      rgba(212, 175, 55, 0.01) 140deg,
-      rgba(212, 175, 55, 0.15) 160deg,
-      rgba(212, 175, 55, 0.45) 180deg,
-      rgba(212, 175, 55, 0.15) 200deg,
-      rgba(212, 175, 55, 0.01) 220deg,
-      transparent 240deg,
-      transparent 360deg
-    );
-    animation: borderRotate var(--glow-duration, 12s) linear infinite;
-    animation-delay: var(--glow-delay, 0s);
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.3;
-    filter: blur(4px); /* Lower blur radius is significantly lighter on GPU pixel shaders */
-    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: transform;
-    transform: translate3d(-50%, -50%, 0) rotate(0.001deg);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    transform-style: preserve-3d;
+    display: none;
   }
 
-  .rotating-border-glow:hover::before {
-    opacity: 0.65;
+  @media (min-width: 768px) {
+    .rotating-border-glow::before {
+      display: block;
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 180%;
+      height: 180%;
+      /* Pre-feathered conic gradient reduces the need for high filter blur, saving significant GPU cycles */
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        transparent 120deg,
+        rgba(212, 175, 55, 0.01) 140deg,
+        rgba(212, 175, 55, 0.15) 160deg,
+        rgba(212, 175, 55, 0.45) 180deg,
+        rgba(212, 175, 55, 0.15) 200deg,
+        rgba(212, 175, 55, 0.01) 220deg,
+        transparent 240deg,
+        transparent 360deg
+      );
+      animation: borderRotate var(--glow-duration, 12s) linear infinite;
+      animation-play-state: paused; /* Keep animation paused by default to save CPU/GPU resource cycles */
+      animation-delay: var(--glow-delay, 0s);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0; /* Keep hidden by default to avoid pixel fill rate overhead */
+      filter: blur(4px); /* Lower blur radius is significantly lighter on GPU pixel shaders */
+      transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+      transform: translate3d(-50%, -50%, 0) rotate(0.001deg);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+    }
+
+    .rotating-border-glow:hover::before {
+      opacity: 0.65;
+      animation-play-state: running; /* Run the animation only when user explicitly hovers the card */
+    }
   }
 
   /* Ensure card content stays above the rotating glow */
@@ -420,8 +429,89 @@
     flex-direction: column !important;
 }
 
+/* --- Marquee Ticker Animation --- */
+@keyframes marquee-ltr {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee-ltr 75s linear infinite;
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.animate-marquee:hover,
+.animate-marquee:active {
+  animation-play-state: paused;
+}
+
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 220px;
+}
+
 /* Sayfa Kaymasını Engelle */
 html, body {
     overflow-x: hidden !important;
     width: 100%;
+}
+
+/* --- Mobile Performance Optimization Pack --- */
+
+/* Disable hover effects on touch devices to avoid scroll stuttering and sticky hover states */
+@media (hover: none) {
+  * {
+    pointer-events: auto !important;
+  }
+  /* Remove hover-specific transforms, scales, and shadow increases on mobile */
+  .premium-button:hover,
+  .instagram-button:hover,
+  .rotating-border-glow:hover,
+  .glass-card:hover,
+  .gold-border-card:hover,
+  .custom-scrollbar:hover {
+    transform: none !important;
+    filter: none !important;
+    box-shadow: none !important;
+    scale: none !important;
+  }
+  
+  /* Disable hover rotating border conic glow opacity change on touch screens */
+  .rotating-border-glow:hover::before {
+    opacity: 0.3 !important;
+  }
+}
+
+/* Ensure hardware acceleration for common animated elements and section containers */
+section, 
+.glass-card, 
+.rotating-border-glow, 
+img, 
+iframe, 
+.premium-button, 
+.instagram-button {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  -webkit-perspective: 1000;
+  perspective: 1000;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Optimizing mobile scroll behaviors */
+body {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none; /* Prevents pull-to-refresh drag processing if not needed, but safe to allow bounce container flow */
+  overscroll-behavior-y: auto;
 }
