@@ -658,89 +658,92 @@ export default function App() {
         <div className="absolute bottom-[-15%] right-[-10%] w-[60%] sm:w-[70%] h-[60%] sm:h-[70%] bg-gold/10 rounded-full blur-[150px] sm:blur-[200px] opacity-30 sm:opacity-40" />
       </div>
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/40 backdrop-blur-xl py-3 border-b border-gold/20' : 'bg-transparent py-4 sm:py-6'}`}>
-        <div className="max-w-7xl mx-auto px-4 md:px-6 h-20 sm:h-24 flex items-center justify-between">
-          <div className="flex items-center gap-2 lg:gap-3 xl:gap-4 min-w-0">
-            <div className="flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 min-w-max" onClick={() => {
-              setActiveContentKey(null);
-              window.scrollTo(0, 0);
-            }}>
-              <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-gold rounded-full flex items-center justify-center aspect-square shrink-0 overflow-hidden p-1 sm:p-1.5">
-                <Brain className="text-dark-stitch w-full h-full object-contain animate-logo-dual" />
-              </div>
-              <div className="flex flex-col shrink-0 min-w-max">
-                <span className="text-sm sm:text-base md:text-lg font-serif font-bold tracking-tight text-white leading-none whitespace-nowrap">EKREM YALÇIN</span>
-                <span className="text-[7px] sm:text-[8px] md:text-[9px] uppercase tracking-[0.15em] sm:tracking-[0.2em] text-gold font-medium whitespace-nowrap">Dr. Öğretim Üyesi</span>
-              </div>
+      <nav className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/40 backdrop-blur-xl py-2 sm:py-3 border-b border-gold/20' : 'bg-transparent py-3 sm:py-6'}`}>
+        <div className="w-full max-w-7xl mx-auto px-6 h-16 sm:h-20 lg:h-24 flex items-center justify-between gap-3 lg:gap-4">
+          {/* Logo (Left) */}
+          <div className="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0 flex-shrink-0" onClick={() => {
+            setActiveContentKey(null);
+            window.scrollTo(0, 0);
+          }}>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-gold rounded-full flex items-center justify-center aspect-square shrink-0 overflow-hidden p-1 sm:p-1.5">
+              <Brain className="text-dark-stitch w-full h-full object-contain animate-logo-dual" />
             </div>
-            <div className="hidden lg:flex items-center lg:gap-2 xl:gap-3.5">
-              {navLinks.map((link) => (
-                <div 
-                  key={link.name} 
-                  className="relative py-4"
-                  onMouseEnter={() => link.dropdown && setOpenDropdown(link.name)}
-                  onMouseLeave={() => setOpenDropdown(null)}
-                >
-                  <a 
-                    href={link.href} 
-                    onClick={(e) => {
-                      if (!link.dropdown) {
-                        setActiveContentKey(null);
-                        window.scrollTo(0, 0);
-                      } else {
-                        e.preventDefault();
-                        setOpenDropdown(openDropdown === link.name ? null : link.name);
-                      }
-                    }}
-                    className={`text-[10px] xl:text-[11px] font-bold tracking-wider uppercase transition-colors inline-flex items-center gap-1.5 w-auto whitespace-nowrap shrink-0 ${openDropdown === link.name ? 'text-gold' : 'text-white/50 hover:text-gold'}`}
-                  >
-                    <span>{link.name}</span>
-                    {link.dropdown && <ChevronDown className="w-2.5 h-2.5 opacity-60 shrink-0" />}
-                  </a>
-                  
-                  {link.dropdown && (
-                    <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-2 transition-all duration-300 z-50 ${openDropdown === link.name ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2'}`}>
-                      <div className="bg-dark-stitch/95 backdrop-blur-xl border border-gold/20 rounded-sm p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] min-w-[320px]">
-                        <div className="flex flex-col gap-6">
-                          {link.dropdown.map((group, gIdx) => (
-                            <div key={gIdx} className="space-y-3">
-                              {group.title && (
-                                <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-gold/80 border-b border-gold/10 pb-1">
-                                  {group.title}
-                                </div>
-                              )}
-                              <div className="flex flex-col gap-2">
-                                {group.items.map((item, iIdx) => (
-                                  <a 
-                                    key={iIdx} 
-                                    href="#" 
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      setActiveContentKey(item.slug);
-                                      setOpenDropdown(null);
-                                    }}
-                                    className="text-xs text-white/60 hover:text-gold transition-colors block py-0.5"
-                                  >
-                                    {item.name}
-                                  </a>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+            <div className="flex flex-col shrink-0 flex-shrink-0">
+              <span className="text-xs sm:text-base md:text-lg font-serif font-bold tracking-tight text-white leading-none whitespace-nowrap">EKREM YALÇIN</span>
+              <span className="text-[7px] sm:text-[8px] md:text-[9px] uppercase tracking-[0.15em] sm:tracking-[0.2em] text-gold font-medium whitespace-nowrap">Dr. Öğretim Üyesi</span>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 ml-1 sm:ml-2 lg:ml-3 xl:ml-6 shrink-0">
+
+          {/* Navigation Links (Center - Desktop) */}
+          <div className="hidden lg:flex items-center justify-center gap-3 lg:gap-4">
+            {navLinks.map((link) => (
+              <div 
+                key={link.name} 
+                className="relative py-4"
+                onMouseEnter={() => link.dropdown && setOpenDropdown(link.name)}
+                onMouseLeave={() => setOpenDropdown(null)}
+              >
+                <a 
+                  href={link.href} 
+                  onClick={(e) => {
+                    if (!link.dropdown) {
+                      setActiveContentKey(null);
+                      window.scrollTo(0, 0);
+                    } else {
+                      e.preventDefault();
+                      setOpenDropdown(openDropdown === link.name ? null : link.name);
+                    }
+                  }}
+                  className={`text-xs lg:text-[12.5px] font-bold tracking-wider uppercase transition-colors inline-flex items-center gap-1 whitespace-nowrap shrink-0 ${openDropdown === link.name ? 'text-gold' : 'text-white/60 hover:text-gold'}`}
+                >
+                  <span>{link.name}</span>
+                  {link.dropdown && <ChevronDown className="w-2.5 h-2.5 opacity-60 shrink-0" />}
+                </a>
+                
+                {link.dropdown && (
+                  <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-2 transition-all duration-300 z-50 ${openDropdown === link.name ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2'}`}>
+                    <div className="bg-dark-stitch/95 backdrop-blur-xl border border-gold/20 rounded-sm p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] min-w-[320px]">
+                      <div className="flex flex-col gap-6">
+                        {link.dropdown.map((group, gIdx) => (
+                          <div key={gIdx} className="space-y-3">
+                            {group.title && (
+                              <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-gold/80 border-b border-gold/10 pb-1">
+                                {group.title}
+                              </div>
+                            )}
+                            <div className="flex flex-col gap-2">
+                              {group.items.map((item, iIdx) => (
+                                <a 
+                                  key={iIdx} 
+                                  href="#" 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    setActiveContentKey(item.slug);
+                                    setOpenDropdown(null);
+                                  }}
+                                  className="text-xs text-white/60 hover:text-gold transition-colors block py-0.5"
+                                >
+                                  {item.name}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Right Action Buttons */}
+          <div className="flex items-center gap-2 flex-shrink-0">
             <a 
               href="https://www.instagram.com/dr_ekremyalcin06/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="instagram-button !p-2 sm:!p-2.5 !px-2 sm:!px-2.5 shrink-0"
+              className="instagram-button !p-2 sm:!p-2.5 shrink-0 flex-shrink-0"
               title="Instagram"
             >
               <Instagram className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -750,18 +753,18 @@ export default function App() {
                 trackGAEvent('Appointment', 'Click', 'Header Randevu Al');
                 setIsAppointmentModalOpen(true);
               }} 
-              className="premium-button !px-2.5 sm:!px-6 !py-1.5 sm:!py-3 !text-[10px] sm:!text-xs shrink-0 whitespace-nowrap"
+              className="premium-button !px-3 !py-1.5 !text-xs shrink-0 flex-shrink-0 whitespace-nowrap"
             >
               Randevu Al
             </button>
             
-            {/* Mobile Toggle */}
+            {/* Mobile Menu Toggle */}
             <button 
-              className="lg:hidden text-white p-1.5 sm:p-2 flex items-center justify-center shrink-0 min-h-[36px] min-w-[36px]" 
+              className="lg:hidden text-white p-1.5 sm:p-2 flex items-center justify-center shrink-0 flex-shrink-0 min-h-[36px] min-w-[36px]" 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Menü"
             >
-              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isMobileMenuOpen ? <X className="w-6 h-6 text-gold" /> : <Menu className="w-6 h-6 text-white" />}
             </button>
           </div>
         </div>
@@ -907,7 +910,7 @@ export default function App() {
       ) : (
         <main className="w-full max-w-full overflow-x-hidden">
         {/* Hero Section */}
-        <section id="home" className="relative min-h-screen flex items-center pt-28 sm:pt-36 lg:pt-40 pb-12 overflow-hidden" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
+        <section id="home" className="relative min-h-screen flex items-center pt-24 sm:pt-32 lg:pt-36 pb-12 overflow-hidden w-full max-w-full" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
           {/* Transparent Background to allow global gradient to show */}
           <div className="absolute inset-0 z-0 bg-transparent" />
           
@@ -936,36 +939,36 @@ export default function App() {
           </div>
 
           {/* Decorative Light Beams */}
-          <div className="light-beam top-0 left-1/4 opacity-30" />
-          <div className="light-beam top-0 left-3/4 opacity-20" />
+          <div className="light-beam top-0 left-1/4 opacity-30 pointer-events-none" />
+          <div className="light-beam top-0 left-3/4 opacity-20 pointer-events-none" />
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-gold/5 to-transparent pointer-events-none" />
           
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 w-full py-6 sm:py-10">
-            <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
               <motion.div 
                 initial={isMobile ? { opacity: 0 } : { opacity: 0, x: -50 }}
                 animate={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
                 transition={{ duration: isMobile ? 0.5 : 1, delay: isMobile ? 0.1 : 0.2 }}
-                className="lg:col-span-6 max-w-lg"
+                className="lg:col-span-6 w-full max-w-md lg:max-w-xl mx-auto lg:mx-0 flex flex-col items-center lg:items-start text-center lg:text-left"
               >
-                <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-                  <div className="h-px w-8 sm:w-12 bg-gold/50 shrink-0" />
+                <div className="flex items-center justify-center lg:justify-start gap-3 sm:gap-4 mb-4 sm:mb-8 w-full">
+                  <div className="h-px w-6 sm:w-12 bg-gold/50 shrink-0" />
                   <span className="text-gold text-[10px] sm:text-xs font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase">
                     Beyin, Omurilik ve Sinir Cerrahisi
                   </span>
                 </div>
                 
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif leading-[1.15] mb-6 premium-text-gradient tracking-tight break-words">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif leading-[1.15] mb-4 sm:mb-6 premium-text-gradient tracking-tight break-words w-full">
                   Gelişmiş <br className="hidden sm:block" />
                   <span className="italic text-gold">Beyin Cerrahi</span> <br className="hidden sm:block" />
                   Çözümleri
                 </h1>
                 
-                <p className="text-sm sm:text-base md:text-lg text-white/60 mb-8 leading-relaxed max-w-md font-light antialiased break-words">
+                <p className="text-sm sm:text-base md:text-lg text-white/60 mb-6 sm:mb-8 leading-relaxed max-w-md font-light antialiased break-words">
                   Dr. Öğretim Üyesi Ekrem Yalçın liderliğinde, modern mikrocerrahi teknikleri ve teknolojik hassasiyetle sağlığınıza odaklanıyoruz.
                 </p>
                 
-                <div className="flex flex-wrap items-center gap-6">
+                <div className="flex items-center justify-center lg:justify-start w-full">
                   <button 
                     onClick={() => {
                       trackGAEvent('Appointment', 'Click', 'Hero Randevu Al');
@@ -983,7 +986,7 @@ export default function App() {
                 initial={isMobile ? { opacity: 0 } : { opacity: 0, x: 50, scale: 0.9 }}
                 animate={isMobile ? { opacity: 1 } : { opacity: 1, x: 0, scale: 1 }}
                 transition={{ duration: isMobile ? 0.5 : 1, delay: isMobile ? 0.2 : 0.4 }}
-                className="lg:col-span-6 relative flex justify-center lg:justify-end"
+                className="lg:col-span-6 relative flex justify-center lg:justify-end w-full max-w-full"
               >
                 <div className="relative group w-full max-w-xs sm:max-w-md lg:max-w-lg mx-auto lg:ml-auto lg:mr-0 soft-glow-bg scale-100 sm:scale-105 lg:scale-115 origin-center lg:origin-right transition-transform duration-500">
                   {/* Tech HUD Elements - Enhanced for "Robotic" feel */}
@@ -1009,8 +1012,8 @@ export default function App() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-dark-stitch via-transparent to-transparent opacity-70" />
                     <div className="absolute bottom-0 left-0 w-full p-3 sm:p-5 lg:p-6 bg-gradient-to-t from-dark-stitch via-dark-stitch/90 to-transparent">
-                      <div className="text-lg sm:text-2xl lg:text-3xl font-serif font-bold text-white mb-0.5 sm:mb-1 tracking-tight drop-shadow-lg break-words">Dr. Ekrem Yalçın</div>
-                      <div className="text-[10px] sm:text-xs font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase text-gold drop-shadow-md break-words">Beyin ve Sinir Cerrahisi Uzmanı</div>
+                      <div className="text-base sm:text-2xl lg:text-3xl font-serif font-bold text-white mb-0.5 sm:mb-1 tracking-tight drop-shadow-lg break-words">Dr. Ekrem Yalçın</div>
+                      <div className="text-[9px] sm:text-xs font-bold tracking-[0.15em] sm:tracking-[0.3em] uppercase text-gold drop-shadow-md break-words">Beyin ve Sinir Cerrahisi Uzmanı</div>
                     </div>
                   </div>
 
@@ -1110,35 +1113,36 @@ export default function App() {
         </section>
 
         {/* About Section */}
-        <section id="about" className="py-12 relative tech-pattern" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <section id="about" className="py-12 relative tech-pattern w-full max-w-full overflow-hidden" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center w-full">
             <motion.div 
               {...animAboutImage}
-              className="relative group"
+              className="relative group w-full max-w-xs sm:max-w-md lg:max-w-none mx-auto flex justify-center"
             >
-              <div className="relative z-10 aspect-[4/5] rounded-sm overflow-hidden border border-gold/30 shadow-[0_0_50px_rgba(0,0,0,0.5)] w-full">
+              <div className="relative z-10 aspect-[4/5] rounded-xl overflow-hidden border border-gold/30 shadow-[0_0_50px_rgba(0,0,0,0.5)] w-full">
                 <img 
                   src="https://i.ibb.co/Jw5v18ZQ/Whats-App-mage-2026-04-10-at-09-13-14.jpg" 
                   alt="Dr. Ekrem Yalçın" 
-                  className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000"
                   referrerPolicy="no-referrer"
                   loading="lazy"
                   decoding="async"
                 />
                 <div className="absolute inset-0 bg-gold/5 pointer-events-none" />
               </div>
-              <div className="hidden sm:block absolute -top-8 -left-8 w-full h-full border border-gold/20 -z-0" />
-              <div className="hidden sm:block absolute -bottom-8 -right-8 w-32 h-32 border-r border-b border-gold/40" />
+              <div className="hidden sm:block absolute -top-6 -left-6 w-full h-full border border-gold/20 -z-0 pointer-events-none" />
+              <div className="hidden sm:block absolute -bottom-6 -right-6 w-32 h-32 border-r border-b border-gold/40 pointer-events-none" />
               {/* Decorative Glow */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gold/5 blur-[100px] rounded-full -z-10" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gold/5 blur-[100px] rounded-full -z-10 pointer-events-none" />
             </motion.div>
 
             <motion.div
               {...animAboutText}
+              className="w-full flex flex-col items-start text-left"
             >
               <span className="text-gold font-bold tracking-[0.3em] sm:tracking-[0.4em] uppercase text-xs mb-3 block">Dr. Ekrem Yalçın Kimdir?</span>
-              <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif mb-4 leading-tight break-words">Akademik Birikim ve <span className="text-gold">Cerrahi Hassasiyet</span></h2>
-              <div className="space-y-4 text-white/50 text-base sm:text-lg leading-relaxed mb-6 font-light break-words">
+              <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif mb-4 leading-tight break-words w-full">Akademik Birikim ve <span className="text-gold">Cerrahi Hassasiyet</span></h2>
+              <div className="space-y-4 text-white/50 text-base sm:text-lg leading-relaxed mb-6 font-light break-words w-full text-left sm:text-justify">
                 <p>
                   Op. Dr. Ekrem YALÇIN, 1967 yılında Konya’nın Kulu ilçesinde doğmuştur. 1991 yılında Selçuk Üniversitesi Tıp Fakültesi’nden mezun olmuş, 2001 yılında İzmir SSK Eğitim ve Araştırma Hastanesi’nde uzmanlık eğitimini tamamlayarak Beyin ve Sinir Cerrahisi Uzmanı unvanını almıştır.
                 </p>
@@ -1146,12 +1150,12 @@ export default function App() {
                   Rize, Trabzon, Ankara ve Van illerinde çeşitli hastanelerde Beyin, Omurilik ve Sinir Cerrahisi Uzmanı ve Başhekim olarak görev yapmıştır. Halen Ankara Medipol Üniversitesi Tıp Fakültesi Beyin, Omurilik ve Sinir Cerrahisi Anabilim Dalı’nda Doktor Öğretim Üyesi olarak görevine devam etmektedir.
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 mb-6">
-                <div className="flex flex-col sm:block">
+              <div className="flex flex-row items-center justify-start gap-8 sm:gap-12 mb-6 w-full">
+                <div className="flex flex-col">
                   <div className="text-3xl sm:text-4xl font-serif text-gold mb-1">20+</div>
                   <div className="text-xs tracking-widest uppercase text-white/30 break-words">Yıllık Deneyim</div>
                 </div>
-                <div className="flex flex-col sm:block">
+                <div className="flex flex-col">
                   <div className="text-3xl sm:text-4xl font-serif text-gold mb-1">10000+</div>
                   <div className="text-xs tracking-widest uppercase text-white/30 break-words">Başarılı Operasyon</div>
                 </div>
@@ -1230,31 +1234,31 @@ export default function App() {
         </section>
 
         {/* Certificates Section */}
-        <section id="certificates" className="py-10 overflow-hidden relative" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
+        <section id="certificates" className="py-10 overflow-hidden relative w-full max-w-full" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
           {/* Subtle Glow for Certificates Section */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gold/5 rounded-full blur-[120px] pointer-events-none opacity-30" />
           
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 relative z-10">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-8">
-              <div className="max-w-2xl">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 relative z-10 w-full">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6 md:gap-8 w-full">
+              <div className="max-w-2xl w-full">
                 <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-4 block">Başarılarımız</span>
                 <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif premium-text-gradient leading-tight break-words">Uluslararası Başarılar ve <span className="italic text-gold/80">Sertifikalar</span></h2>
                 <p className="mt-4 text-white/40 text-sm sm:text-lg font-light leading-relaxed antialiased break-words">
                   Tıbbi mükemmeliyet yolculuğumuzda kazandığımız uluslararası geçerliliğe sahip yetki belgeleri ve uzmanlık sertifikaları.
                 </p>
               </div>
-              <div className="flex gap-4">
+              <div className="flex gap-4 shrink-0">
                 <button 
                   onClick={() => scrollCerts('left')}
-                  className="p-5 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-dark-stitch hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-500 group bg-white/5 backdrop-blur-sm"
+                  className="p-3 sm:p-5 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-dark-stitch hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-500 group bg-white/5 backdrop-blur-sm"
                 >
-                  <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
+                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-1 transition-transform" />
                 </button>
                 <button 
                   onClick={() => scrollCerts('right')}
-                  className="p-5 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-dark-stitch hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-500 group bg-white/5 backdrop-blur-sm"
+                  className="p-3 sm:p-5 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-dark-stitch hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-500 group bg-white/5 backdrop-blur-sm"
                 >
-                  <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </div>
@@ -1262,7 +1266,7 @@ export default function App() {
             <div 
               ref={certScrollRef}
               onScroll={handleCertScroll}
-              className="flex gap-10 overflow-x-auto pb-16 no-scrollbar snap-x snap-mandatory"
+              className="flex gap-6 sm:gap-10 overflow-x-auto pb-12 sm:pb-16 no-scrollbar snap-x snap-mandatory w-full"
               style={{ willChange: "transform, scroll-position", transform: "translate3d(0,0,0)", WebkitOverflowScrolling: "touch" }}
             >
               {certificates.map((cert) => (
@@ -1272,9 +1276,9 @@ export default function App() {
                   transition={{ type: "tween", ease: "easeOut", duration: 0.3 }}
                   style={{ willChange: "transform" }}
                   onClick={() => setSelectedCert(cert)}
-                  className="min-w-[200px] md:min-w-[240px] snap-start group cursor-pointer"
+                  className="w-[200px] sm:w-[220px] md:w-[250px] max-w-xs snap-start group cursor-pointer shrink-0"
                 >
-                  <div className="relative aspect-[4/5] rounded-sm overflow-hidden border border-gold/30 shadow-[0_40px_80px_rgba(0,0,0,0.6)] bg-white mb-4 group-hover:border-gold transition-all duration-500">
+                  <div className="relative aspect-[4/5] rounded-xl overflow-hidden border border-gold/30 shadow-[0_20px_40px_rgba(0,0,0,0.5)] bg-white mb-3 sm:mb-4 group-hover:border-gold transition-all duration-500">
                     <img 
                       src={cert.image} 
                       alt={cert.title} 
@@ -1290,45 +1294,45 @@ export default function App() {
                     <div className="absolute inset-0 bg-gradient-to-t from-dark-stitch via-transparent to-transparent opacity-80" />
                     
                     <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 bg-dark-stitch/40 backdrop-blur-[3px]">
-                      <div className="w-20 h-20 rounded-full bg-gold flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.5)] mb-4 group-hover:scale-110 transition-transform duration-500">
-                        <Award className="text-dark-stitch w-10 h-10" />
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gold flex items-center justify-center shadow-[0_0_25px_rgba(212,175,55,0.5)] mb-3 group-hover:scale-110 transition-transform duration-500">
+                        <Award className="text-dark-stitch w-6 h-6 sm:w-8 sm:h-8" />
                       </div>
-                      <span className="text-white font-bold tracking-widest uppercase text-xs">Sertifikayı İncele</span>
+                      <span className="text-white font-bold tracking-widest uppercase text-[10px] sm:text-xs">Sertifikayı İncele</span>
                     </div>
 
                     {/* Certificate Frame Effect */}
-                    <div className="absolute inset-6 border border-white/10 pointer-events-none" />
-                    <div className="absolute inset-8 border border-white/5 pointer-events-none" />
+                    <div className="absolute inset-4 sm:inset-6 border border-white/10 pointer-events-none" />
+                    <div className="absolute inset-6 sm:inset-8 border border-white/5 pointer-events-none" />
                   </div>
                   
-                  <div className="px-4">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="h-px w-10 bg-gold" />
-                      <span className="text-gold text-xs font-bold uppercase tracking-[0.2em]">{cert.year}</span>
+                  <div className="px-1 sm:px-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="h-px w-6 sm:w-8 bg-gold" />
+                      <span className="text-gold text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em]">{cert.year}</span>
                     </div>
-                    <h4 className="text-2xl font-serif font-bold mb-3 group-hover:text-gold transition-colors tracking-tight">{cert.title}</h4>
-                    <p className="text-white/40 text-sm uppercase tracking-widest font-semibold">{cert.issuer}</p>
+                    <h4 className="text-base sm:text-lg font-serif font-bold mb-1.5 group-hover:text-gold transition-colors tracking-tight break-words">{cert.title}</h4>
+                    <p className="text-white/40 text-xs uppercase tracking-widest font-semibold break-words">{cert.issuer}</p>
                   </div>
                 </motion.div>
               ))}
             </div>
             
-            <div className="mt-6 flex flex-col items-center gap-6">
-              <div className="flex gap-3">
+            <div className="mt-6 flex flex-col items-center gap-6 w-full">
+              <div className="flex gap-2 sm:gap-3">
                 {certificates.map((_, i) => (
-                  <div key={i} className={`h-1.5 rounded-full transition-all duration-500 ${i === activeCertIndex ? 'w-12 bg-gold shadow-[0_0_10px_rgba(212,175,55,0.5)]' : 'w-2 bg-white/10'}`} />
+                  <div key={i} className={`h-1.5 rounded-full transition-all duration-500 ${i === activeCertIndex ? 'w-8 sm:w-12 bg-gold shadow-[0_0_10px_rgba(212,175,55,0.5)]' : 'w-2 bg-white/10'}`} />
                 ))}
               </div>
 
               <button 
                 onClick={() => setIsCertGalleryModalOpen(true)}
-                className="group relative px-10 py-5 rounded-full overflow-hidden transition-all duration-500 hover:shadow-[0_0_50px_rgba(212,175,55,0.6)] hover:scale-[1.05]"
+                className="group relative px-6 sm:px-10 py-3.5 sm:py-5 rounded-full overflow-hidden transition-all duration-500 hover:shadow-[0_0_50px_rgba(212,175,55,0.6)] hover:scale-[1.03] max-w-full"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-gold via-[#F5E6AD] to-gold animate-gradient-x" />
                 <div className="absolute inset-[2px] bg-dark-stitch rounded-full group-hover:bg-transparent transition-colors duration-500" />
-                <span className="relative z-10 text-gold group-hover:text-dark-stitch font-bold tracking-[0.2em] uppercase text-xs flex items-center gap-3">
+                <span className="relative z-10 text-gold group-hover:text-dark-stitch font-bold tracking-[0.15em] sm:tracking-[0.2em] uppercase text-[10px] sm:text-xs flex items-center gap-2 sm:gap-3 whitespace-nowrap">
                   Tüm Sertifikaları Görüntüle ({certificates.length} Sertifika)
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                 </span>
               </button>
             </div>
@@ -1336,33 +1340,28 @@ export default function App() {
         </section>
 
         {/* Contact Section */}
-        <section id="contact" className="pt-16 pb-2 relative overflow-hidden" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
+        <section id="contact" className="pt-12 sm:pt-16 pb-6 relative overflow-hidden w-full max-w-full" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
           {/* Premium Subtle Gold Glows - Light, not color */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-gold/5 rounded-full blur-[150px] pointer-events-none opacity-50" />
-          <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-gold/3 rounded-full blur-[100px] pointer-events-none" />
-          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-gold/3 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[1000px] h-[600px] sm:h-[1000px] bg-gold/5 rounded-full blur-[100px] sm:blur-[150px] pointer-events-none opacity-50" />
           
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 relative z-10">
-            <div className="flex flex-col items-center text-center mb-10">
-              <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-6 block">İletişim</span>
-              <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif mb-8 premium-text-gradient break-words">Sağlığınız İçin <br />Bizimle <span className="text-gold">İletişime Geçin</span></h2>
-              <div className="h-px w-24 bg-gold/30 mt-4 mx-auto" />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 relative z-10 w-full">
+            <div className="flex flex-col items-center text-center mb-8 sm:mb-10 w-full">
+              <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-4 sm:mb-6 block">İletişim</span>
+              <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif mb-6 sm:mb-8 premium-text-gradient break-words w-full">Sağlığınız İçin <br />Bizimle <span className="text-gold">İletişime Geçin</span></h2>
+              <div className="h-px w-20 sm:w-24 bg-gold/30 mt-2 sm:mt-4 mx-auto" />
             </div>
             
-            <div className="grid md:grid-cols-3 gap-6 mb-10 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-10 max-w-6xl mx-auto w-full">
               {/* Address Card */}
               <motion.div 
                 whileHover={cardHoverHigh}
-                className="glass-card p-6 sm:p-8 md:p-12 rounded-sm border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden"
+                className="glass-card p-6 sm:p-8 md:p-12 rounded-xl border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden w-full"
               >
-                {/* Subtle Card Glow */}
-                <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gold/5 blur-3xl group-hover:bg-gold/10 transition-all duration-500" />
-                
-                <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center mb-8 border border-gold/20 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(212,175,55,0.2)]">
-                  <MapPin className="text-gold w-7 h-7" />
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gold/10 rounded-full flex items-center justify-center mb-6 sm:mb-8 border border-gold/20 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(212,175,55,0.2)] shrink-0">
+                  <MapPin className="text-gold w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
-                <h5 className="text-gold font-bold uppercase tracking-widest text-[10px] mb-6">Adres</h5>
-                <p className="text-white/70 text-sm leading-relaxed max-w-[250px] font-light">
+                <h5 className="text-gold font-bold uppercase tracking-widest text-[10px] mb-4 sm:mb-6">Adres</h5>
+                <p className="text-white/70 text-xs sm:text-sm leading-relaxed font-light break-words">
                   Medipol Üniversitesi Rektörlüğü Ankara/Altındağ,<br />
                   Özel Ortadoğu Hastanesi Gayret, İvedik Cd. No:41,<br />
                   06170 Yenimahalle/Ankara
@@ -1372,27 +1371,24 @@ export default function App() {
               {/* Phone Card */}
               <motion.div 
                 whileHover={cardHoverHigh}
-                className="glass-card p-6 sm:p-8 md:p-12 rounded-sm border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden"
+                className="glass-card p-6 sm:p-8 md:p-12 rounded-xl border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden w-full"
               >
-                {/* Subtle Card Glow */}
-                <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gold/5 blur-3xl group-hover:bg-gold/10 transition-all duration-500" />
-                
-                <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center mb-8 border border-gold/20 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(212,175,55,0.2)]">
-                  <Phone className="text-gold w-7 h-7" />
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gold/10 rounded-full flex items-center justify-center mb-6 sm:mb-8 border border-gold/20 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(212,175,55,0.2)] shrink-0">
+                  <Phone className="text-gold w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
-                <h5 className="text-gold font-bold uppercase tracking-widest text-[10px] mb-6">Telefon</h5>
+                <h5 className="text-gold font-bold uppercase tracking-widest text-[10px] mb-4 sm:mb-6">Telefon</h5>
                 <div className="flex flex-col gap-3">
                   <a 
                     href="tel:+905072339497" 
                     onClick={() => trackGAEvent('Contact', 'Phone Call', '+90 507 233 94 97')}
-                    className="text-white/70 hover:text-gold transition-colors text-sm font-medium tracking-wide"
+                    className="text-white/70 hover:text-gold transition-colors text-xs sm:text-sm font-medium tracking-wide"
                   >
                     +90 507 233 94 97
                   </a>
                   <a 
                     href="tel:+905534448895" 
                     onClick={() => trackGAEvent('Contact', 'Phone Call', '+90 553 444 88 95')}
-                    className="text-white/70 hover:text-gold transition-colors text-sm font-medium tracking-wide"
+                    className="text-white/70 hover:text-gold transition-colors text-xs sm:text-sm font-medium tracking-wide"
                   >
                     +90 553 444 88 95
                   </a>
@@ -1402,19 +1398,16 @@ export default function App() {
               {/* Email Card */}
               <motion.div 
                 whileHover={cardHoverHigh}
-                className="glass-card p-6 sm:p-8 md:p-12 rounded-sm border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden"
+                className="glass-card p-6 sm:p-8 md:p-12 rounded-xl border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden sm:col-span-2 md:col-span-1 w-full"
               >
-                {/* Subtle Card Glow */}
-                <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gold/5 blur-3xl group-hover:bg-gold/10 transition-all duration-500" />
-                
-                <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center mb-8 border border-gold/20 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(212,175,55,0.2)]">
-                  <Mail className="text-gold w-7 h-7" />
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gold/10 rounded-full flex items-center justify-center mb-6 sm:mb-8 border border-gold/20 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(212,175,55,0.2)] shrink-0">
+                  <Mail className="text-gold w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
-                <h5 className="text-gold font-bold uppercase tracking-widest text-[10px] mb-6">E-posta</h5>
+                <h5 className="text-gold font-bold uppercase tracking-widest text-[10px] mb-4 sm:mb-6">E-posta</h5>
                 <a 
                   href="mailto:info@drekremyalcin.com.tr" 
                   onClick={() => trackGAEvent('Contact', 'Email Click', 'info@drekremyalcin.com.tr')}
-                  className="text-white/70 hover:text-gold transition-colors text-sm font-medium tracking-wide break-all"
+                  className="text-white/70 hover:text-gold transition-colors text-xs sm:text-sm font-medium tracking-wide break-all"
                 >
                   info@drekremyalcin.com.tr
                 </a>
@@ -1438,36 +1431,36 @@ export default function App() {
         </section>
 
         {/* Locations Section */}
-        <section id="locations" className="pt-2 pb-10 relative overflow-hidden border-t border-white/5" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 relative z-10">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-2 gap-8">
+        <section id="locations" className="pt-2 pb-10 relative overflow-hidden border-t border-white/5 w-full max-w-full" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 relative z-10 w-full">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4 sm:gap-8 w-full">
               <div>
-                <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-[2px] block">Ulaşım</span>
+                <span className="text-gold font-bold tracking-[0.4em] uppercase text-xs mb-2 block">Ulaşım</span>
                 <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif premium-text-gradient break-words">Lokasyonumuz</h2>
-                <p className="mt-0 text-white/40 text-sm sm:text-lg font-light max-w-xl break-words">
+                <p className="mt-2 text-white/40 text-sm sm:text-lg font-light max-w-xl break-words">
                   Ankara'nın merkezi noktasında, en ileri teknolojik donanımlara sahip hastanemizde hizmetinizdeyiz.
                 </p>
               </div>
             </div>
 
-            <div className="grid lg:grid-cols-12 gap-8 items-stretch">
+            <div className="grid lg:grid-cols-12 gap-6 sm:gap-8 items-stretch w-full">
               {/* Address Cards */}
-              <div className="lg:col-span-4 min-h-[300px] lg:h-[450px] flex flex-col">
+              <div className="lg:col-span-4 min-h-[260px] lg:h-[450px] flex flex-col w-full">
                 {locations.map((loc) => (
                   <motion.div 
                     key={loc.id}
                     whileHover={navHoverRight}
-                    className="glass-card p-6 sm:p-8 rounded-sm border-gold/20 hover:border-gold/60 transition-all duration-500 group relative overflow-hidden h-full flex flex-col"
+                    className="glass-card p-6 sm:p-8 rounded-xl border-gold/20 hover:border-gold/60 transition-all duration-500 group relative overflow-hidden h-full flex flex-col w-full"
                   >
                     <div className="absolute top-0 left-0 w-1 h-full bg-gold/0 group-hover:bg-gold transition-all duration-500" />
                     <div className="flex items-start gap-4 h-full">
                       <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center shrink-0 group-hover:bg-gold group-hover:text-dark-stitch transition-all">
                         <MapPin className="w-5 h-5" />
                       </div>
-                      <div className="flex flex-col justify-between h-full flex-1">
+                      <div className="flex flex-col justify-between h-full flex-1 min-w-0">
                         <div>
-                          <h4 className="text-gold font-serif text-lg sm:text-xl font-bold mb-3">{loc.name}</h4>
-                          <p className="text-white/50 text-xs sm:text-sm leading-relaxed mb-6">{loc.address}</p>
+                          <h4 className="text-gold font-serif text-lg sm:text-xl font-bold mb-3 break-words">{loc.name}</h4>
+                          <p className="text-white/50 text-xs sm:text-sm leading-relaxed mb-6 break-words">{loc.address}</p>
                         </div>
                         <div className="flex flex-col gap-4 mt-auto">
                           <div className="flex items-center gap-3 text-white/40 text-xs sm:text-sm">
@@ -1491,7 +1484,7 @@ export default function App() {
               </div>
 
               {/* Map Container */}
-              <div ref={mapContainerRef} className="lg:col-span-8 h-[350px] sm:h-[400px] lg:h-[450px] rounded-lg overflow-hidden border-2 border-gold shadow-[0_0_40px_rgba(212,175,55,0.25)] relative">
+              <div ref={mapContainerRef} className="lg:col-span-8 h-[280px] sm:h-[380px] lg:h-[450px] rounded-xl overflow-hidden border-2 border-gold shadow-[0_0_40px_rgba(212,175,55,0.25)] relative w-full">
                 {isMapInView ? (
                   <iframe
                     src="https://maps.google.com/maps?q=Özel+Ortadoğu+Hastanesi+Yenimahalle+Ankara&t=&z=16&ie=UTF8&iwloc=&output=embed"
@@ -1520,12 +1513,12 @@ export default function App() {
       )}
 
       {/* Footer */}
-      <footer className="pt-16 pb-8 border-t border-white/5 relative overflow-hidden">
+      <footer className="pt-12 sm:pt-16 pb-8 border-t border-white/5 relative overflow-hidden w-full max-w-full">
         {/* Footer Glow - Subtle and soft */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-full bg-gold/5 blur-[150px] pointer-events-none opacity-40" />
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 relative z-10 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 mb-12 w-full">
             <div className="lg:col-span-1">
               <div className="text-2xl font-serif font-bold tracking-tighter gold-text-gradient mb-4">
                 DR.EKREM YALÇIN <span className="text-white/30 font-light">| MEDICINE</span>
