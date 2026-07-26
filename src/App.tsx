@@ -659,7 +659,7 @@ export default function App() {
       </div>
       {/* Navigation */}
       <nav className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/40 backdrop-blur-xl py-2 sm:py-3 border-b border-gold/20' : 'bg-transparent py-3 sm:py-6'}`}>
-        <div className="w-full max-w-7xl mx-auto px-6 h-16 sm:h-20 lg:h-24 flex items-center justify-between gap-3 lg:gap-4">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 lg:h-24 flex items-center justify-between gap-2 sm:gap-3 lg:gap-4">
           {/* Logo (Left) */}
           <div className="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0 flex-shrink-0" onClick={() => {
             setActiveContentKey(null);
@@ -675,7 +675,7 @@ export default function App() {
           </div>
 
           {/* Navigation Links (Center - Desktop) */}
-          <div className="hidden lg:flex items-center justify-center gap-3 lg:gap-4">
+          <div className="hidden lg:flex items-center justify-center gap-[14px] xl:gap-5">
             {navLinks.map((link) => (
               <div 
                 key={link.name} 
@@ -694,7 +694,7 @@ export default function App() {
                       setOpenDropdown(openDropdown === link.name ? null : link.name);
                     }
                   }}
-                  className={`text-xs lg:text-[12.5px] font-bold tracking-wider uppercase transition-colors inline-flex items-center gap-1 whitespace-nowrap shrink-0 ${openDropdown === link.name ? 'text-gold' : 'text-white/60 hover:text-gold'}`}
+                  className={`text-[12px] xl:text-[13px] font-bold tracking-wider uppercase transition-colors inline-flex items-center gap-1 whitespace-nowrap shrink-0 ${openDropdown === link.name ? 'text-gold' : 'text-white/60 hover:text-gold'}`}
                 >
                   <span>{link.name}</span>
                   {link.dropdown && <ChevronDown className="w-2.5 h-2.5 opacity-60 shrink-0" />}
@@ -910,7 +910,7 @@ export default function App() {
       ) : (
         <main className="w-full max-w-full overflow-x-hidden">
         {/* Hero Section */}
-        <section id="home" className="relative min-h-screen flex items-center pt-24 sm:pt-32 lg:pt-36 pb-12 overflow-hidden w-full max-w-full" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
+        <section id="home" className="relative min-h-screen flex flex-col items-center justify-center pt-24 sm:pt-32 lg:pt-36 pb-12 overflow-hidden w-full max-w-full px-4" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
           {/* Transparent Background to allow global gradient to show */}
           <div className="absolute inset-0 z-0 bg-transparent" />
           
@@ -943,32 +943,32 @@ export default function App() {
           <div className="light-beam top-0 left-3/4 opacity-20 pointer-events-none" />
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-gold/5 to-transparent pointer-events-none" />
           
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 w-full py-6 sm:py-10">
-            <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 w-full py-6 sm:py-10 flex flex-col items-center justify-center text-center lg:text-left">
+            <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-center justify-center w-full">
               <motion.div 
-                initial={isMobile ? { opacity: 0 } : { opacity: 0, x: -50 }}
-                animate={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
-                transition={{ duration: isMobile ? 0.5 : 1, delay: isMobile ? 0.1 : 0.2 }}
-                className="lg:col-span-6 w-full max-w-md lg:max-w-xl mx-auto lg:mx-0 flex flex-col items-center lg:items-start text-center lg:text-left"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6 }}
+                className="lg:col-span-6 w-full max-w-sm lg:max-w-xl mx-auto lg:mx-0 flex flex-col items-center lg:items-start text-center lg:text-left"
               >
-                <div className="flex items-center justify-center lg:justify-start gap-3 sm:gap-4 mb-4 sm:mb-8 w-full">
+                <div className="flex items-center justify-center lg:justify-start gap-3 sm:gap-4 mb-4 sm:mb-8 w-full max-w-sm lg:max-w-none mx-auto lg:mx-0">
                   <div className="h-px w-6 sm:w-12 bg-gold/50 shrink-0" />
                   <span className="text-gold text-[10px] sm:text-xs font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase">
                     Beyin, Omurilik ve Sinir Cerrahisi
                   </span>
                 </div>
                 
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif leading-[1.15] mb-4 sm:mb-6 premium-text-gradient tracking-tight break-words w-full">
+                <h1 className="w-full max-w-sm lg:max-w-none mx-auto lg:mx-0 text-center lg:text-left text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif leading-[1.15] mb-4 sm:mb-6 premium-text-gradient tracking-tight break-words">
                   Gelişmiş <br className="hidden sm:block" />
                   <span className="italic text-gold">Beyin Cerrahi</span> <br className="hidden sm:block" />
                   Çözümleri
                 </h1>
                 
-                <p className="text-sm sm:text-base md:text-lg text-white/60 mb-6 sm:mb-8 leading-relaxed max-w-md font-light antialiased break-words">
+                <p className="w-full max-w-sm lg:max-w-md mx-auto lg:mx-0 text-center lg:text-left text-sm sm:text-base md:text-lg text-white/60 mb-6 sm:mb-8 leading-relaxed font-light antialiased break-words">
                   Dr. Öğretim Üyesi Ekrem Yalçın liderliğinde, modern mikrocerrahi teknikleri ve teknolojik hassasiyetle sağlığınıza odaklanıyoruz.
                 </p>
                 
-                <div className="flex items-center justify-center lg:justify-start w-full">
+                <div className="w-full max-w-sm lg:max-w-none mx-auto lg:mx-0 flex items-center justify-center lg:justify-start">
                   <button 
                     onClick={() => {
                       trackGAEvent('Appointment', 'Click', 'Hero Randevu Al');
@@ -983,12 +983,12 @@ export default function App() {
               </motion.div>
 
               <motion.div
-                initial={isMobile ? { opacity: 0 } : { opacity: 0, x: 50, scale: 0.9 }}
-                animate={isMobile ? { opacity: 1 } : { opacity: 1, x: 0, scale: 1 }}
-                transition={{ duration: isMobile ? 0.5 : 1, delay: isMobile ? 0.2 : 0.4 }}
-                className="lg:col-span-6 relative flex justify-center lg:justify-end w-full max-w-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="lg:col-span-6 relative w-full max-w-sm lg:max-w-lg mx-auto lg:ml-auto lg:mr-0 flex justify-center lg:justify-end"
               >
-                <div className="relative group w-full max-w-xs sm:max-w-md lg:max-w-lg mx-auto lg:ml-auto lg:mr-0 soft-glow-bg scale-100 sm:scale-105 lg:scale-115 origin-center lg:origin-right transition-transform duration-500">
+                <div className="relative group w-full max-w-sm mx-auto lg:ml-auto lg:mr-0 soft-glow-bg transition-transform duration-500 flex justify-center">
                   {/* Tech HUD Elements - Enhanced for "Robotic" feel */}
                   <div className="absolute -inset-10 border border-gold/10 rounded-full -z-10 animate-[spin_25s_linear_infinite] opacity-0 sm:opacity-20 pointer-events-none hidden sm:block" />
                   <div className="absolute -inset-6 border border-gold/20 rounded-sm -z-10 animate-pulse hidden sm:block pointer-events-none" />
