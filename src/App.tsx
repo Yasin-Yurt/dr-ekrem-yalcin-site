@@ -907,7 +907,7 @@ export default function App() {
       ) : (
         <main className="w-full max-w-full overflow-x-hidden">
         {/* Hero Section */}
-        <section id="home" className="relative min-h-screen flex items-center pt-32 md:pt-40 pb-12 overflow-hidden w-full max-w-full" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
+        <section id="home" className="relative min-h-screen flex items-center pt-28 sm:pt-36 lg:pt-40 pb-12 overflow-hidden" style={{ willChange: "transform", transform: "translate3d(0,0,0)" }}>
           {/* Transparent Background to allow global gradient to show */}
           <div className="absolute inset-0 z-0 bg-transparent" />
           
@@ -941,31 +941,31 @@ export default function App() {
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-gold/5 to-transparent pointer-events-none" />
           
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 w-full py-6 sm:py-10">
-            <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full max-w-full">
+            <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               <motion.div 
                 initial={isMobile ? { opacity: 0 } : { opacity: 0, x: -50 }}
                 animate={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
                 transition={{ duration: isMobile ? 0.5 : 1, delay: isMobile ? 0.1 : 0.2 }}
-                className="lg:col-span-6 w-full flex flex-col items-center sm:items-start text-center sm:text-left"
+                className="lg:col-span-6 max-w-lg"
               >
-                <div className="flex items-center justify-center sm:justify-start gap-3 sm:gap-4 mb-6 sm:mb-8 w-full">
+                <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
                   <div className="h-px w-8 sm:w-12 bg-gold/50 shrink-0" />
-                  <span className="text-gold text-[10px] sm:text-xs font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase break-words">
+                  <span className="text-gold text-[10px] sm:text-xs font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase">
                     Beyin, Omurilik ve Sinir Cerrahisi
                   </span>
                 </div>
                 
-                <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif leading-[1.15] mb-6 premium-text-gradient tracking-tight break-words w-full px-2">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif leading-[1.15] mb-6 premium-text-gradient tracking-tight break-words">
                   Gelişmiş <br className="hidden sm:block" />
                   <span className="italic text-gold">Beyin Cerrahi</span> <br className="hidden sm:block" />
                   Çözümleri
                 </h1>
                 
-                <p className="text-sm sm:text-lg md:text-xl text-white/60 mb-8 leading-relaxed max-w-xl font-light antialiased break-words w-full px-2">
+                <p className="text-sm sm:text-base md:text-lg text-white/60 mb-8 leading-relaxed max-w-md font-light antialiased break-words">
                   Dr. Öğretim Üyesi Ekrem Yalçın liderliğinde, modern mikrocerrahi teknikleri ve teknolojik hassasiyetle sağlığınıza odaklanıyoruz.
                 </p>
                 
-                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-6 w-full">
+                <div className="flex flex-wrap items-center gap-6">
                   <button 
                     onClick={() => {
                       trackGAEvent('Appointment', 'Click', 'Hero Randevu Al');
@@ -983,33 +983,33 @@ export default function App() {
                 initial={isMobile ? { opacity: 0 } : { opacity: 0, x: 50, scale: 0.9 }}
                 animate={isMobile ? { opacity: 1 } : { opacity: 1, x: 0, scale: 1 }}
                 transition={{ duration: isMobile ? 0.5 : 1, delay: isMobile ? 0.2 : 0.4 }}
-                className="lg:col-span-6 relative flex justify-center lg:justify-end w-full max-w-full px-2 sm:px-0"
+                className="lg:col-span-6 relative flex justify-center lg:justify-end"
               >
-                <div className="relative group w-full max-w-xs sm:max-w-sm lg:max-w-md mx-auto lg:ml-auto lg:mr-0 soft-glow-bg overflow-hidden sm:overflow-visible">
+                <div className="relative group w-full max-w-xs sm:max-w-md lg:max-w-lg mx-auto lg:ml-auto lg:mr-0 soft-glow-bg scale-100 sm:scale-105 lg:scale-115 origin-center lg:origin-right transition-transform duration-500">
                   {/* Tech HUD Elements - Enhanced for "Robotic" feel */}
                   <div className="absolute -inset-10 border border-gold/10 rounded-full -z-10 animate-[spin_25s_linear_infinite] opacity-0 sm:opacity-20 pointer-events-none hidden sm:block" />
                   <div className="absolute -inset-6 border border-gold/20 rounded-sm -z-10 animate-pulse hidden sm:block pointer-events-none" />
-                  <div className="absolute inset-0 sm:-inset-1 border border-gold/40 rounded-sm -z-10 pointer-events-none" />
+                  <div className="absolute inset-0 sm:-inset-1 border border-gold/40 rounded-xl -z-10 pointer-events-none" />
                   
-                  {/* Corner Accents - Contained within bounds on mobile */}
+                  {/* Corner Accents */}
                   <div className="hidden sm:block absolute -top-2 -left-2 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-l-2 border-gold z-20 pointer-events-none" />
                   <div className="hidden sm:block absolute -top-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-r-2 border-gold z-20 pointer-events-none" />
                   <div className="hidden sm:block absolute -bottom-2 -left-2 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-l-2 border-gold z-20 pointer-events-none" />
                   <div className="hidden sm:block absolute -bottom-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-r-2 border-gold z-20 pointer-events-none" />
 
-                  <div className="relative z-10 rounded-sm overflow-hidden border border-gold/30 shadow-[0_0_130px_rgba(212,175,55,0.3)] aspect-[4/5] w-full">
+                  <div className="relative z-10 rounded-xl overflow-hidden border border-gold/30 shadow-[0_0_130px_rgba(212,175,55,0.3)] aspect-video w-full">
                     <img 
                       src="https://i.ibb.co/LD6xLykj/ekrem-yalcin-kimdir-3.jpg" 
                       alt="Dr. Ekrem Yalçın" 
-                      className="w-full h-full object-cover brightness-110 contrast-105 transition-all duration-1000 scale-105 hover:scale-100"
+                      className="w-full h-full object-cover rounded-xl brightness-110 contrast-105 transition-all duration-1000 scale-105 hover:scale-100"
                       referrerPolicy="no-referrer"
                       loading="eager"
                       fetchPriority="high"
                       decoding="async"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-dark-stitch via-transparent to-transparent opacity-70" />
-                    <div className="absolute bottom-0 left-0 w-full p-4 sm:p-6 lg:p-8 bg-gradient-to-t from-dark-stitch via-dark-stitch/90 to-transparent">
-                      <div className="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-white mb-1 tracking-tight drop-shadow-lg break-words">Dr. Ekrem Yalçın</div>
+                    <div className="absolute bottom-0 left-0 w-full p-3 sm:p-5 lg:p-6 bg-gradient-to-t from-dark-stitch via-dark-stitch/90 to-transparent">
+                      <div className="text-lg sm:text-2xl lg:text-3xl font-serif font-bold text-white mb-0.5 sm:mb-1 tracking-tight drop-shadow-lg break-words">Dr. Ekrem Yalçın</div>
                       <div className="text-[10px] sm:text-xs font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase text-gold drop-shadow-md break-words">Beyin ve Sinir Cerrahisi Uzmanı</div>
                     </div>
                   </div>
