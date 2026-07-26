@@ -941,31 +941,31 @@ export default function App() {
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-gold/5 to-transparent pointer-events-none" />
           
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 w-full py-6 sm:py-10">
-            <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full max-w-full">
               <motion.div 
                 initial={isMobile ? { opacity: 0 } : { opacity: 0, x: -50 }}
                 animate={isMobile ? { opacity: 1 } : { opacity: 1, x: 0 }}
                 transition={{ duration: isMobile ? 0.5 : 1, delay: isMobile ? 0.1 : 0.2 }}
-                className="lg:col-span-6"
+                className="lg:col-span-6 w-full flex flex-col items-center sm:items-start text-center sm:text-left"
               >
-                <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+                <div className="flex items-center justify-center sm:justify-start gap-3 sm:gap-4 mb-6 sm:mb-8 w-full">
                   <div className="h-px w-8 sm:w-12 bg-gold/50 shrink-0" />
                   <span className="text-gold text-[10px] sm:text-xs font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase break-words">
                     Beyin, Omurilik ve Sinir Cerrahisi
                   </span>
                 </div>
                 
-                <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif leading-[1.15] mb-6 premium-text-gradient tracking-tight break-words">
+                <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif leading-[1.15] mb-6 premium-text-gradient tracking-tight break-words w-full px-2">
                   Gelişmiş <br className="hidden sm:block" />
                   <span className="italic text-gold">Beyin Cerrahi</span> <br className="hidden sm:block" />
                   Çözümleri
                 </h1>
                 
-                <p className="text-sm sm:text-lg md:text-xl text-white/60 mb-8 leading-relaxed max-w-xl font-light antialiased break-words">
+                <p className="text-sm sm:text-lg md:text-xl text-white/60 mb-8 leading-relaxed max-w-xl font-light antialiased break-words w-full px-2">
                   Dr. Öğretim Üyesi Ekrem Yalçın liderliğinde, modern mikrocerrahi teknikleri ve teknolojik hassasiyetle sağlığınıza odaklanıyoruz.
                 </p>
                 
-                <div className="flex flex-wrap items-center gap-6">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-6 w-full">
                   <button 
                     onClick={() => {
                       trackGAEvent('Appointment', 'Click', 'Hero Randevu Al');
@@ -985,7 +985,7 @@ export default function App() {
                 transition={{ duration: isMobile ? 0.5 : 1, delay: isMobile ? 0.2 : 0.4 }}
                 className="lg:col-span-6 relative flex justify-center lg:justify-end w-full max-w-full px-2 sm:px-0"
               >
-                <div className="relative group w-full max-w-[calc(100vw-2.5rem)] sm:max-w-none scale-100 sm:scale-105 lg:scale-[1.12] lg:translate-x-16 transition-transform duration-1000 origin-center lg:origin-right soft-glow-bg">
+                <div className="relative group w-full max-w-md mx-auto sm:max-w-none scale-100 sm:scale-105 lg:scale-[1.12] lg:translate-x-16 transition-transform duration-1000 origin-center lg:origin-right soft-glow-bg">
                   {/* Tech HUD Elements - Enhanced for "Robotic" feel */}
                   <div className="absolute -inset-10 border border-gold/10 rounded-full -z-10 animate-[spin_25s_linear_infinite] opacity-0 sm:opacity-20 pointer-events-none hidden sm:block" />
                   <div className="absolute -inset-6 border border-gold/20 rounded-sm -z-10 animate-pulse hidden sm:block pointer-events-none" />
