@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import type { LegalDocument } from './components/LegalModal';
-import { sanitizeInput, sanitizeForMessage, loadRecaptchaScript, executeRecaptcha } from './utils/security';
+import { sanitizeInput, sanitizeForMessage } from './utils/security';
 import CookieConsent from './components/CookieConsent';
 
 const ContentPage = React.lazy(() => import('./components/ContentPage').then(module => ({ default: module.ContentPage })));
@@ -2069,9 +2069,9 @@ export default function App() {
 
               <form 
                 className="space-y-6"
-                onSubmit={async (e) => {
+                onSubmit={(e) => {
                   e.preventDefault();
-                  if (isSubmittingForm || formCooldown) return;
+                  if (isSubmittingForm || isSubmitted) return;
 
                   setIsSubmittingForm(true);
                   const form = e.target as HTMLFormElement;
@@ -2079,15 +2079,12 @@ export default function App() {
                   const rawDate = (form.elements.namedItem('date') as HTMLInputElement).value;
                   const rawNote = (form.elements.namedItem('note') as HTMLTextAreaElement).value;
 
-                  // 1. Input Sanitization (XSS & Script Injection Prevention)
+                  // Input Sanitization
                   const name = sanitizeForMessage(rawName);
                   const date = sanitizeInput(rawDate);
                   const note = sanitizeForMessage(rawNote);
 
-                  // 2. Execute reCAPTCHA v3 Bot Protection Token
-                  await executeRecaptcha('submit_appointment');
-
-                  // 3. WhatsApp Redirect URL Generation
+                  // Direct WhatsApp Redirect
                   const doctorNumber = "905072339497";
                   const message = `Merhaba Dr. Ekrem Bey, web siteniz üzerinden randevu talebi oluşturmak istiyorum.%0A%0A*Ad Soyad:* ${encodeURIComponent(name)}%0A*Tercih Edilen Tarih:* ${encodeURIComponent(date)}%0A*Şikayet / Not:* ${encodeURIComponent(note)}`;
                   const whatsappUrl = `https://wa.me/${doctorNumber}?text=${message}`;
@@ -2095,14 +2092,16 @@ export default function App() {
                   trackGAEvent('Appointment', 'Submit WhatsApp', name);
                   window.open(whatsappUrl, '_blank');
 
-                  // 4. Rate Limiting / Debounce (3 Seconds Spam Protection)
-                  setFormCooldown(true);
+                  // Immediate submission status feedback
                   setTimeout(() => {
-                    setFormCooldown(false);
-                  }, 3000);
+                    setIsSubmittingForm(false);
+                    setIsSubmitted(true);
 
-                  setIsSubmittingForm(false);
-                  setIsAppointmentModalOpen(false);
+                    setTimeout(() => {
+                      setIsSubmitted(false);
+                      setIsAppointmentModalOpen(false);
+                    }, 2000);
+                  }, 400);
                 }}
               >
                 <div className="space-y-2">
@@ -2111,7 +2110,6 @@ export default function App() {
                     required 
                     name="name" 
                     type="text" 
-                    onFocus={() => loadRecaptchaScript()}
                     className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 text-white focus:border-gold outline-none transition-all" 
                     placeholder="Adınız ve Soyadınız" 
                   />
@@ -2123,7 +2121,6 @@ export default function App() {
                     required 
                     name="date" 
                     type="date" 
-                    onFocus={() => loadRecaptchaScript()}
                     className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 text-white focus:border-gold outline-none transition-all" 
                   />
                 </div>
@@ -2134,7 +2131,6 @@ export default function App() {
                     required 
                     name="note" 
                     rows={4} 
-                    onFocus={() => loadRecaptchaScript()}
                     className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 text-white focus:border-gold outline-none transition-all resize-none" 
                     placeholder="Lütfen şikayetinizi kısaca belirtiniz..."
                   ></textarea>
@@ -2142,18 +2138,18 @@ export default function App() {
 
                 <button 
                   type="submit" 
-                  disabled={isSubmittingForm || formCooldown}
-                  className="premium-button w-full mt-4 flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                  disabled={isSubmittingForm || isSubmitted}
+                  className="premium-button w-full mt-4 flex items-center justify-center gap-3 disabled:opacity-80 disabled:cursor-not-allowed transition-all"
                 >
                   {isSubmittingForm ? (
                     <>
                       <div className="w-5 h-5 border-2 border-dark-stitch border-t-transparent rounded-full animate-spin shrink-0" />
-                      <span>Güvenlik Kontrolü Yapılıyor...</span>
+                      <span>Gönderiliyor...</span>
                     </>
-                  ) : formCooldown ? (
+                  ) : isSubmitted ? (
                     <>
-                      <Lock className="w-5 h-5 shrink-0" />
-                      <span>İşlem Alındı (Lütfen Bekleyin)</span>
+                      <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
+                      <span className="text-emerald-400 font-bold">Randevu Talebiniz Başarıyla Alındı!</span>
                     </>
                   ) : (
                     <>
@@ -2163,11 +2159,11 @@ export default function App() {
                   )}
                 </button>
 
-                {/* reCAPTCHA v3 & Privacy Protection Notice */}
+                {/* Privacy Notice */}
                 <div className="pt-2 text-center text-[10px] text-white/40 flex items-center justify-center gap-1.5 leading-relaxed">
                   <ShieldCheck className="w-3.5 h-3.5 text-gold/80 shrink-0" />
                   <span>
-                    Bu form Google reCAPTCHA v3 ile korunmaktadır. 
+                    Kişisel verileriniz KVKK ilkelerine uygun şekilde korunmaktadır.
                     <button 
                       type="button"
                       onClick={() => setSelectedLegalDoc(legalDocuments.gizlilik)} 
