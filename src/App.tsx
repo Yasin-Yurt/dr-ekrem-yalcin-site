@@ -659,7 +659,7 @@ export default function App() {
       </div>
       {/* Navigation */}
       <nav className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/40 backdrop-blur-xl py-2 sm:py-3 border-b border-gold/20' : 'bg-transparent py-3 sm:py-6'}`}>
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 lg:h-24 flex items-center justify-between gap-2 sm:gap-3 lg:gap-4">
+        <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 h-16 sm:h-20 lg:h-24 flex items-center justify-between gap-2 sm:gap-3 lg:gap-4">
           {/* Logo (Left) */}
           <div className="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0 flex-shrink-0" onClick={() => {
             setActiveContentKey(null);
@@ -753,9 +753,11 @@ export default function App() {
                 trackGAEvent('Appointment', 'Click', 'Header Randevu Al');
                 setIsAppointmentModalOpen(true);
               }} 
-              className="premium-button !px-3 !py-1.5 !text-xs shrink-0 flex-shrink-0 whitespace-nowrap"
+              className="premium-button !p-2 sm:!p-2.5 shrink-0 flex-shrink-0"
+              title="Online Randevu Al"
+              aria-label="Online Randevu Al"
             >
-              Randevu Al
+              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
             
             {/* Mobile Menu Toggle */}
@@ -986,9 +988,9 @@ export default function App() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="lg:col-span-6 relative w-full max-w-sm lg:max-w-lg mx-auto lg:ml-auto lg:mr-0 flex justify-center lg:justify-end"
+                className="lg:col-span-6 relative w-full max-w-sm lg:max-w-xl lg:w-[580px] mx-auto lg:ml-auto lg:mr-0 flex justify-center lg:justify-end"
               >
-                <div className="relative group w-full max-w-sm mx-auto lg:ml-auto lg:mr-0 soft-glow-bg transition-transform duration-500 flex justify-center">
+                <div className="relative group w-full max-w-sm lg:max-w-xl lg:w-[580px] mx-auto lg:ml-auto lg:mr-0 soft-glow-bg transition-transform duration-500 flex justify-center">
                   {/* Tech HUD Elements - Enhanced for "Robotic" feel */}
                   <div className="absolute -inset-10 border border-gold/10 rounded-full -z-10 animate-[spin_25s_linear_infinite] opacity-0 sm:opacity-20 pointer-events-none hidden sm:block" />
                   <div className="absolute -inset-6 border border-gold/20 rounded-sm -z-10 animate-pulse hidden sm:block pointer-events-none" />
