@@ -985,7 +985,7 @@ export default function App() {
                 transition={{ duration: isMobile ? 0.5 : 1, delay: isMobile ? 0.2 : 0.4 }}
                 className="lg:col-span-6 relative flex justify-center lg:justify-end w-full max-w-full px-2 sm:px-0"
               >
-                <div className="relative group w-full max-w-md mx-auto sm:max-w-none scale-100 sm:scale-105 lg:scale-[1.12] lg:translate-x-16 transition-transform duration-1000 origin-center lg:origin-right soft-glow-bg">
+                <div className="relative group w-full max-w-xs sm:max-w-sm lg:max-w-md mx-auto lg:ml-auto lg:mr-0 soft-glow-bg overflow-hidden sm:overflow-visible">
                   {/* Tech HUD Elements - Enhanced for "Robotic" feel */}
                   <div className="absolute -inset-10 border border-gold/10 rounded-full -z-10 animate-[spin_25s_linear_infinite] opacity-0 sm:opacity-20 pointer-events-none hidden sm:block" />
                   <div className="absolute -inset-6 border border-gold/20 rounded-sm -z-10 animate-pulse hidden sm:block pointer-events-none" />
@@ -997,7 +997,7 @@ export default function App() {
                   <div className="hidden sm:block absolute -bottom-2 -left-2 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-l-2 border-gold z-20 pointer-events-none" />
                   <div className="hidden sm:block absolute -bottom-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-r-2 border-gold z-20 pointer-events-none" />
 
-                  <div className="relative z-10 rounded-sm overflow-hidden border border-gold/30 shadow-[0_0_130px_rgba(212,175,55,0.3)] aspect-[4/5] lg:aspect-auto w-full">
+                  <div className="relative z-10 rounded-sm overflow-hidden border border-gold/30 shadow-[0_0_130px_rgba(212,175,55,0.3)] aspect-[4/5] w-full">
                     <img 
                       src="https://i.ibb.co/LD6xLykj/ekrem-yalcin-kimdir-3.jpg" 
                       alt="Dr. Ekrem Yalçın" 
@@ -1008,9 +1008,9 @@ export default function App() {
                       decoding="async"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-dark-stitch via-transparent to-transparent opacity-70" />
-                    <div className="absolute bottom-0 left-0 w-full p-4 sm:p-8 lg:p-10 bg-gradient-to-t from-dark-stitch via-dark-stitch/90 to-transparent">
-                      <div className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-white mb-1.5 tracking-tight drop-shadow-lg break-words">Dr. Ekrem Yalçın</div>
-                      <div className="text-xs sm:text-sm font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase text-gold drop-shadow-md break-words">Beyin ve Sinir Cerrahisi Uzmanı</div>
+                    <div className="absolute bottom-0 left-0 w-full p-4 sm:p-6 lg:p-8 bg-gradient-to-t from-dark-stitch via-dark-stitch/90 to-transparent">
+                      <div className="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-white mb-1 tracking-tight drop-shadow-lg break-words">Dr. Ekrem Yalçın</div>
+                      <div className="text-[10px] sm:text-xs font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase text-gold drop-shadow-md break-words">Beyin ve Sinir Cerrahisi Uzmanı</div>
                     </div>
                   </div>
 
