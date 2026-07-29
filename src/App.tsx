@@ -221,15 +221,13 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
-  const [formCooldown, setFormCooldown] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [activeCertIndex, setActiveCertIndex] = useState(0);
   const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
   const [activeContentKey, setActiveContentKey] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [videoSearchQuery, setVideoSearchQuery] = useState('');
-  const [isMapInView, setIsMapInView] = useState(false);
-  const mapContainerRef = React.useRef<HTMLDivElement>(null);
+  const [isMapInteractive, setIsMapInteractive] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -246,23 +244,23 @@ export default function App() {
   const videoCardHover = isMobile ? {} : { y: -10 };
   const navHoverRight = isMobile ? {} : { x: 10 };
 
-  const animAboutImage = {
-    initial: isMobile ? { opacity: 0 } : { opacity: 0, scale: 0.95 },
-    whileInView: isMobile ? { opacity: 1 } : { opacity: 1, scale: 1 },
+  const animAboutImage = isMobile ? { initial: { opacity: 1 }, animate: { opacity: 1 } } : {
+    initial: { opacity: 0, scale: 0.95 },
+    whileInView: { opacity: 1, scale: 1 },
     viewport: { once: true },
     transition: { duration: 0.5 }
   };
 
-  const animAboutText = {
-    initial: isMobile ? { opacity: 0 } : { opacity: 0, x: 30 },
-    whileInView: isMobile ? { opacity: 1 } : { opacity: 1, x: 0 },
+  const animAboutText = isMobile ? { initial: { opacity: 1 }, animate: { opacity: 1 } } : {
+    initial: { opacity: 0, x: 30 },
+    whileInView: { opacity: 1, x: 0 },
     viewport: { once: true },
     transition: { duration: 0.5 }
   };
 
-  const animSpecialtyCard = {
-    initial: isMobile ? { opacity: 0 } : { opacity: 0, y: 20 },
-    whileInView: isMobile ? { opacity: 1 } : { opacity: 1, y: 0 },
+  const animSpecialtyCard = isMobile ? { initial: { opacity: 1 }, animate: { opacity: 1 } } : {
+    initial: { opacity: 0, y: 20 },
+    whileInView: { opacity: 1, y: 0 },
     viewport: { once: true },
     transition: { type: "tween", ease: "easeOut", duration: 0.3 }
   };
@@ -356,30 +354,6 @@ export default function App() {
       document.documentElement.style.removeProperty('overflow');
     };
   }, [isGalleryModalOpen, isCertGalleryModalOpen, selectedVideo, selectedLegalDoc]);
-
-  // Lazy load Google Maps when container is near viewport
-  useEffect(() => {
-    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
-      setIsMapInView(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting) {
-          setIsMapInView(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: '300px' } // Load 300px before reaching the viewport
-    );
-    if (mapContainerRef.current) {
-      observer.observe(mapContainerRef.current);
-    }
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
 
   const navLinks: NavLink[] = [
     { name: 'Anasayfa', href: '#home' },
@@ -661,14 +635,14 @@ export default function App() {
       <nav className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/40 backdrop-blur-xl py-2 sm:py-3 border-b border-gold/20' : 'bg-transparent py-3 sm:py-6'}`}>
         <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 h-16 sm:h-20 lg:h-24 flex items-center justify-between gap-2 sm:gap-3 lg:gap-4">
           {/* Logo (Left) */}
-          <div className="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0 flex-shrink-0" onClick={() => {
+          <div className="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" onClick={() => {
             setActiveContentKey(null);
             window.scrollTo(0, 0);
           }}>
             <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-gold rounded-full flex items-center justify-center aspect-square shrink-0 overflow-hidden p-1 sm:p-1.5">
               <Brain className="text-dark-stitch w-full h-full object-contain animate-logo-dual" />
             </div>
-            <div className="flex flex-col shrink-0 flex-shrink-0">
+            <div className="flex flex-col shrink-0">
               <span className="text-xs sm:text-base md:text-lg font-serif font-bold tracking-tight text-white leading-none whitespace-nowrap">EKREM YALÇIN</span>
               <span className="text-[7px] sm:text-[8px] md:text-[9px] uppercase tracking-[0.15em] sm:tracking-[0.2em] text-gold font-medium whitespace-nowrap">Dr. Öğretim Üyesi</span>
             </div>
@@ -738,12 +712,12 @@ export default function App() {
           </div>
 
           {/* Right Action Buttons */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <a 
               href="https://www.instagram.com/dr_ekremyalcin06/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="instagram-button !p-2 sm:!p-2.5 shrink-0 flex-shrink-0"
+              className="instagram-button !p-2 sm:!p-2.5 shrink-0"
               title="Instagram"
             >
               <Instagram className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -753,7 +727,7 @@ export default function App() {
                 trackGAEvent('Appointment', 'Click', 'Header Randevu Al');
                 setIsAppointmentModalOpen(true);
               }} 
-              className="premium-button !p-2 sm:!p-2.5 shrink-0 flex-shrink-0"
+              className="premium-button !p-2 sm:!p-2.5 shrink-0"
               title="Online Randevu Al"
               aria-label="Online Randevu Al"
             >
@@ -762,7 +736,7 @@ export default function App() {
             
             {/* Mobile Menu Toggle */}
             <button 
-              className="lg:hidden text-white p-1.5 sm:p-2 flex items-center justify-center shrink-0 flex-shrink-0 min-h-[36px] min-w-[36px]" 
+              className="lg:hidden text-white p-1.5 sm:p-2 flex items-center justify-center shrink-0 min-h-[36px] min-w-[36px]" 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Menü"
             >
@@ -1058,7 +1032,7 @@ export default function App() {
             {/* Tüm Videoları İncele Button */}
             <button 
               onClick={() => setIsGalleryModalOpen(true)}
-              className="group relative px-5 py-2.5 rounded-full overflow-hidden transition-all duration-300 hover:shadow-[0_0_25px_rgba(212,175,55,0.4)] hover:scale-[1.03] active:scale-[0.98] border border-gold/40 bg-gold/10 backdrop-blur-sm self-start sm:self-auto shrink-0"
+              className="group relative px-5 py-2.5 rounded-full overflow-hidden transition-all duration-300 hover:shadow-[0_0_25px_rgba(212,175,55,0.4)] hover:scale-[1.03] active:scale-[0.98] border border-gold/40 bg-[#0b1329]/90 self-start sm:self-auto shrink-0"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-gold/20 via-[#F5E6AD]/30 to-gold/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <span className="relative z-10 text-gold font-bold tracking-[0.15em] uppercase text-[11px] sm:text-xs flex items-center gap-2">
@@ -1080,7 +1054,7 @@ export default function App() {
                   <div
                     key={`marquee-${video.id}-${idx}`}
                     onClick={() => setSelectedVideo(video)}
-                    className="w-64 sm:w-80 shrink-0 group cursor-pointer glass-card p-3 rounded-2xl border border-gold/20 hover:border-gold/60 transition-all duration-300 bg-[#0a192f]/80 backdrop-blur-sm flex flex-col gap-2.5 shadow-sm hover:shadow-[0_0_25px_rgba(212,175,55,0.25)] relative overflow-hidden"
+                    className="w-64 sm:w-80 shrink-0 group cursor-pointer glass-card p-3 rounded-2xl border border-amber-500/25 hover:border-amber-400/60 transition-all duration-300 bg-[#0e172e]/90 flex flex-col gap-2.5 shadow-md hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] relative overflow-hidden"
                   >
                     {/* Thumbnail Container */}
                     <div className="aspect-video rounded-xl overflow-hidden relative border border-gold/15 bg-black/40">
@@ -1103,7 +1077,7 @@ export default function App() {
 
                     {/* Video Title */}
                     <div className="px-1 pb-1">
-                      <h4 className="text-xs sm:text-sm font-serif font-medium text-white/90 group-hover:text-gold transition-colors line-clamp-2 leading-snug">
+                      <h4 className="text-xs sm:text-sm font-serif font-medium text-white group-hover:text-gold transition-colors line-clamp-2 leading-snug">
                         {video.title}
                       </h4>
                     </div>
@@ -1144,7 +1118,7 @@ export default function App() {
             >
               <span className="text-gold font-bold tracking-[0.3em] sm:tracking-[0.4em] uppercase text-xs mb-3 block">Dr. Ekrem Yalçın Kimdir?</span>
               <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif mb-4 leading-tight break-words w-full">Akademik Birikim ve <span className="text-gold">Cerrahi Hassasiyet</span></h2>
-              <div className="space-y-4 text-white/50 text-base sm:text-lg leading-relaxed mb-6 font-light break-words w-full text-left sm:text-justify">
+              <div className="space-y-4 text-slate-300 text-base sm:text-lg leading-relaxed mb-6 font-light break-words w-full text-left sm:text-justify">
                 <p>
                   Op. Dr. Ekrem YALÇIN, 1967 yılında Konya’nın Kulu ilçesinde doğmuştur. 1991 yılında Selçuk Üniversitesi Tıp Fakültesi’nden mezun olmuş, 2001 yılında İzmir SSK Eğitim ve Araştırma Hastanesi’nde uzmanlık eğitimini tamamlayarak Beyin ve Sinir Cerrahisi Uzmanı unvanını almıştır.
                 </p>
@@ -1155,11 +1129,11 @@ export default function App() {
               <div className="flex flex-row items-center justify-start gap-8 sm:gap-12 mb-6 w-full">
                 <div className="flex flex-col">
                   <div className="text-3xl sm:text-4xl font-serif text-gold mb-1">20+</div>
-                  <div className="text-xs tracking-widest uppercase text-white/30 break-words">Yıllık Deneyim</div>
+                  <div className="text-xs tracking-widest uppercase text-slate-300 break-words font-medium">Yıllık Deneyim</div>
                 </div>
                 <div className="flex flex-col">
                   <div className="text-3xl sm:text-4xl font-serif text-gold mb-1">10000+</div>
-                  <div className="text-xs tracking-widest uppercase text-white/30 break-words">Başarılı Operasyon</div>
+                  <div className="text-xs tracking-widest uppercase text-slate-300 break-words font-medium">Başarılı Operasyon</div>
                 </div>
               </div>
               <button 
@@ -1191,14 +1165,14 @@ export default function App() {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                   setTimeout(() => setOpenDropdown('Tedaviler'), 500);
                 }}
-                className="glass-card p-6 sm:p-8 rounded-sm text-center flex flex-col items-center gap-6 group border-gold/20 hover:border-gold/60 transition-all duration-500 cursor-pointer relative overflow-hidden rotating-border-glow"
+                className="p-6 sm:p-8 rounded-xl text-center flex flex-col items-center gap-6 group bg-[#1e293b] border-2 border-[#f59e0b]/40 hover:border-[#f59e0b]/80 shadow-lg hover:shadow-[0_0_25px_rgba(245,158,11,0.25)] transition-all duration-500 cursor-pointer relative overflow-hidden"
               >
-                <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center text-gold/60 group-hover:text-gold transition-colors duration-500 drop-shadow-[0_0_15px_rgba(212,175,55,0.2)] border border-gold/20">
+                <div className="w-16 h-16 bg-amber-500/15 rounded-full flex items-center justify-center text-amber-400 group-hover:text-gold group-hover:scale-110 transition-all duration-500 shadow-[0_0_20px_rgba(245,158,11,0.25)] border border-amber-500/30">
                   <Stethoscope className="w-8 h-8" />
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-xl font-serif font-bold tracking-tight text-white group-hover:text-gold transition-colors uppercase">TEDAVİLER</h3>
-                  <p className="text-white/40 text-[10px] font-light tracking-widest uppercase">Beyin, Omurilik ve Sinir Cerrahisi Ameliyatları</p>
+                  <p className="text-slate-100 text-[11px] sm:text-xs font-medium tracking-widest uppercase">Beyin, Omurilik ve Sinir Cerrahisi Ameliyatları</p>
                 </div>
                 <div className="w-8 h-px bg-gold/20 group-hover:w-16 group-hover:bg-gold transition-all duration-500" />
                 
@@ -1216,14 +1190,14 @@ export default function App() {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                   setTimeout(() => setOpenDropdown('Hastalıklar'), 500);
                 }}
-                className="glass-card p-6 sm:p-8 rounded-sm text-center flex flex-col items-center gap-6 group border-gold/20 hover:border-gold/60 transition-all duration-500 cursor-pointer relative overflow-hidden rotating-border-glow"
+                className="p-6 sm:p-8 rounded-xl text-center flex flex-col items-center gap-6 group bg-[#1e293b] border-2 border-[#f59e0b]/40 hover:border-[#f59e0b]/80 shadow-lg hover:shadow-[0_0_25px_rgba(245,158,11,0.25)] transition-all duration-500 cursor-pointer relative overflow-hidden"
               >
-                <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center text-gold/60 group-hover:text-gold transition-colors duration-500 drop-shadow-[0_0_15px_rgba(212,175,55,0.2)] border border-gold/20">
+                <div className="w-16 h-16 bg-amber-500/15 rounded-full flex items-center justify-center text-amber-400 group-hover:text-gold group-hover:scale-110 transition-all duration-500 shadow-[0_0_20px_rgba(245,158,11,0.25)] border border-amber-500/30">
                   <Brain className="w-8 h-8" />
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-xl font-serif font-bold tracking-tight text-white group-hover:text-gold transition-colors uppercase">HASTALIKLAR</h3>
-                  <p className="text-white/40 text-[10px] font-light tracking-widest uppercase">Omurga, Boyun, Bel Sağlığı ve Tanı Kılavuzları</p>
+                  <p className="text-slate-100 text-[11px] sm:text-xs font-medium tracking-widest uppercase">Omurga, Boyun, Bel Sağlığı ve Tanı Kılavuzları</p>
                 </div>
                 <div className="w-8 h-px bg-gold/20 group-hover:w-16 group-hover:bg-gold transition-all duration-500" />
                 
@@ -1252,13 +1226,13 @@ export default function App() {
               <div className="flex gap-4 shrink-0">
                 <button 
                   onClick={() => scrollCerts('left')}
-                  className="p-3 sm:p-5 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-dark-stitch hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-500 group bg-white/5 backdrop-blur-sm"
+                  className="p-3 sm:p-5 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-dark-stitch hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-500 group bg-[#0b1329]/90"
                 >
                   <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-1 transition-transform" />
                 </button>
                 <button 
                   onClick={() => scrollCerts('right')}
-                  className="p-3 sm:p-5 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-dark-stitch hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-500 group bg-white/5 backdrop-blur-sm"
+                  className="p-3 sm:p-5 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-dark-stitch hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-500 group bg-[#0b1329]/90"
                 >
                   <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" />
                 </button>
@@ -1295,7 +1269,7 @@ export default function App() {
                     {/* Glass Overlay on Hover */}
                     <div className="absolute inset-0 bg-gradient-to-t from-dark-stitch via-transparent to-transparent opacity-80" />
                     
-                    <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 bg-dark-stitch/40 backdrop-blur-[3px]">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 bg-[#050a1a]/85">
                       <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gold flex items-center justify-center shadow-[0_0_25px_rgba(212,175,55,0.5)] mb-3 group-hover:scale-110 transition-transform duration-500">
                         <Award className="text-dark-stitch w-6 h-6 sm:w-8 sm:h-8" />
                       </div>
@@ -1313,7 +1287,7 @@ export default function App() {
                       <span className="text-gold text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em]">{cert.year}</span>
                     </div>
                     <h4 className="text-base sm:text-lg font-serif font-bold mb-1.5 group-hover:text-gold transition-colors tracking-tight break-words">{cert.title}</h4>
-                    <p className="text-white/40 text-xs uppercase tracking-widest font-semibold break-words">{cert.issuer}</p>
+                    <p className="text-slate-300 text-xs uppercase tracking-widest font-semibold break-words">{cert.issuer}</p>
                   </div>
                 </motion.div>
               ))}
@@ -1357,13 +1331,13 @@ export default function App() {
               {/* Address Card */}
               <motion.div 
                 whileHover={cardHoverHigh}
-                className="glass-card p-6 sm:p-8 md:p-12 rounded-xl border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden w-full"
+                className="p-6 sm:p-8 md:p-12 rounded-xl bg-[#1e293b] border-2 border-[#f59e0b]/40 hover:border-[#f59e0b]/80 shadow-lg hover:shadow-[0_0_25px_rgba(245,158,11,0.25)] transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden w-full"
               >
-                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gold/10 rounded-full flex items-center justify-center mb-6 sm:mb-8 border border-gold/20 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(212,175,55,0.2)] shrink-0">
-                  <MapPin className="text-gold w-6 h-6 sm:w-7 sm:h-7" />
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-amber-500/15 rounded-full flex items-center justify-center mb-6 sm:mb-8 border border-amber-500/30 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_25px_rgba(245,158,11,0.25)] shrink-0">
+                  <MapPin className="text-amber-400 w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
                 <h5 className="text-gold font-bold uppercase tracking-widest text-[10px] mb-4 sm:mb-6">Adres</h5>
-                <p className="text-white/70 text-xs sm:text-sm leading-relaxed font-light break-words">
+                <p className="text-slate-100 text-xs sm:text-sm leading-relaxed font-normal break-words">
                   Medipol Üniversitesi Rektörlüğü Ankara/Altındağ,<br />
                   Özel Ortadoğu Hastanesi Gayret, İvedik Cd. No:41,<br />
                   06170 Yenimahalle/Ankara
@@ -1373,24 +1347,24 @@ export default function App() {
               {/* Phone Card */}
               <motion.div 
                 whileHover={cardHoverHigh}
-                className="glass-card p-6 sm:p-8 md:p-12 rounded-xl border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden w-full"
+                className="p-6 sm:p-8 md:p-12 rounded-xl bg-[#1e293b] border-2 border-[#f59e0b]/40 hover:border-[#f59e0b]/80 shadow-lg hover:shadow-[0_0_25px_rgba(245,158,11,0.25)] transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden w-full"
               >
-                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gold/10 rounded-full flex items-center justify-center mb-6 sm:mb-8 border border-gold/20 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(212,175,55,0.2)] shrink-0">
-                  <Phone className="text-gold w-6 h-6 sm:w-7 sm:h-7" />
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-amber-500/15 rounded-full flex items-center justify-center mb-6 sm:mb-8 border border-amber-500/30 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_25px_rgba(245,158,11,0.25)] shrink-0">
+                  <Phone className="text-amber-400 w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
                 <h5 className="text-gold font-bold uppercase tracking-widest text-[10px] mb-4 sm:mb-6">Telefon</h5>
                 <div className="flex flex-col gap-3">
                   <a 
                     href="tel:+905072339497" 
                     onClick={() => trackGAEvent('Contact', 'Phone Call', '+90 507 233 94 97')}
-                    className="text-white/70 hover:text-gold transition-colors text-xs sm:text-sm font-medium tracking-wide"
+                    className="text-slate-100 hover:text-gold transition-colors text-xs sm:text-sm font-medium tracking-wide"
                   >
                     +90 507 233 94 97
                   </a>
                   <a 
                     href="tel:+905534448895" 
                     onClick={() => trackGAEvent('Contact', 'Phone Call', '+90 553 444 88 95')}
-                    className="text-white/70 hover:text-gold transition-colors text-xs sm:text-sm font-medium tracking-wide"
+                    className="text-slate-100 hover:text-gold transition-colors text-xs sm:text-sm font-medium tracking-wide"
                   >
                     +90 553 444 88 95
                   </a>
@@ -1400,16 +1374,16 @@ export default function App() {
               {/* Email Card */}
               <motion.div 
                 whileHover={cardHoverHigh}
-                className="glass-card p-6 sm:p-8 md:p-12 rounded-xl border-gold/10 hover:border-gold/40 transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden sm:col-span-2 md:col-span-1 w-full"
+                className="p-6 sm:p-8 md:p-12 rounded-xl bg-[#1e293b] border-2 border-[#f59e0b]/40 hover:border-[#f59e0b]/80 shadow-lg hover:shadow-[0_0_25px_rgba(245,158,11,0.25)] transition-all duration-500 flex flex-col items-center text-center group relative overflow-hidden sm:col-span-2 md:col-span-1 w-full"
               >
-                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gold/10 rounded-full flex items-center justify-center mb-6 sm:mb-8 border border-gold/20 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(212,175,55,0.2)] shrink-0">
-                  <Mail className="text-gold w-6 h-6 sm:w-7 sm:h-7" />
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-amber-500/15 rounded-full flex items-center justify-center mb-6 sm:mb-8 border border-amber-500/30 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_25px_rgba(245,158,11,0.25)] shrink-0">
+                  <Mail className="text-amber-400 w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
                 <h5 className="text-gold font-bold uppercase tracking-widest text-[10px] mb-4 sm:mb-6">E-posta</h5>
                 <a 
                   href="mailto:info@drekremyalcin.com.tr" 
                   onClick={() => trackGAEvent('Contact', 'Email Click', 'info@drekremyalcin.com.tr')}
-                  className="text-white/70 hover:text-gold transition-colors text-xs sm:text-sm font-medium tracking-wide break-all"
+                  className="text-slate-100 hover:text-gold transition-colors text-xs sm:text-sm font-medium tracking-wide break-all"
                 >
                   info@drekremyalcin.com.tr
                 </a>
@@ -1452,21 +1426,21 @@ export default function App() {
                   <motion.div 
                     key={loc.id}
                     whileHover={navHoverRight}
-                    className="glass-card p-6 sm:p-8 rounded-xl border-gold/20 hover:border-gold/60 transition-all duration-500 group relative overflow-hidden h-full flex flex-col w-full"
+                    className="glass-card p-6 sm:p-8 rounded-xl bg-[#0e172e]/90 border border-amber-500/30 hover:border-amber-400/70 hover:shadow-[0_0_25px_rgba(245,158,11,0.2)] transition-all duration-500 group relative overflow-hidden h-full flex flex-col w-full"
                   >
                     <div className="absolute top-0 left-0 w-1 h-full bg-gold/0 group-hover:bg-gold transition-all duration-500" />
                     <div className="flex items-start gap-4 h-full">
-                      <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center shrink-0 group-hover:bg-gold group-hover:text-dark-stitch transition-all">
+                      <div className="w-10 h-10 rounded-full bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0 group-hover:bg-gold group-hover:text-dark-stitch transition-all text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
                         <MapPin className="w-5 h-5" />
                       </div>
                       <div className="flex flex-col justify-between h-full flex-1 min-w-0">
                         <div>
                           <h4 className="text-gold font-serif text-lg sm:text-xl font-bold mb-3 break-words">{loc.name}</h4>
-                          <p className="text-white/50 text-xs sm:text-sm leading-relaxed mb-6 break-words">{loc.address}</p>
+                          <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6 break-words">{loc.address}</p>
                         </div>
                         <div className="flex flex-col gap-4 mt-auto">
-                          <div className="flex items-center gap-3 text-white/40 text-xs sm:text-sm">
-                            <Phone className="w-4 h-4 text-gold/60 shrink-0" />
+                          <div className="flex items-center gap-3 text-slate-300 text-xs sm:text-sm font-medium">
+                            <Phone className="w-4 h-4 text-amber-400 shrink-0" />
                             <span>{loc.phone}</span>
                           </div>
                           <a 
@@ -1486,23 +1460,35 @@ export default function App() {
               </div>
 
               {/* Map Container */}
-              <div ref={mapContainerRef} className="lg:col-span-8 h-[280px] sm:h-[380px] lg:h-[450px] rounded-xl overflow-hidden border-2 border-gold shadow-[0_0_40px_rgba(212,175,55,0.25)] relative w-full">
-                {isMapInView ? (
-                  <iframe
-                    src="https://maps.google.com/maps?q=Özel+Ortadoğu+Hastanesi+Yenimahalle+Ankara&t=&z=16&ie=UTF8&iwloc=&output=embed"
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    className="w-full h-full border-0"
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="Özel Ortadoğu Hastanesi Haritası"
-                  />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-dark-stitch text-white/50 text-sm gap-2">
-                    <span className="text-gold/80 animate-pulse font-serif uppercase tracking-widest text-xs">Harita Yükleniyor...</span>
+              <div className="lg:col-span-8 h-[280px] sm:h-[380px] lg:h-[450px] rounded-xl overflow-hidden border-2 border-gold shadow-[0_0_40px_rgba(212,175,55,0.25)] relative w-full">
+                <iframe
+                  src="https://maps.google.com/maps?q=Özel+Ortadoğu+Hastanesi+Yenimahalle+Ankara&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  className={`w-full h-full border-0 ${isMapInteractive ? 'pointer-events-auto' : 'pointer-events-none md:pointer-events-auto'}`}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Özel Ortadoğu Hastanesi Haritası"
+                />
+                {!isMapInteractive ? (
+                  <div 
+                    onClick={() => setIsMapInteractive(true)} 
+                    className="absolute inset-0 z-20 md:hidden flex items-center justify-center bg-black/20 hover:bg-black/10 cursor-pointer transition-all group"
+                  >
+                    <div className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-slate-900/95 border border-gold/40 text-gold text-xs font-bold uppercase tracking-wider shadow-2xl flex items-center gap-2 group-hover:scale-105 transition-transform">
+                      <MapPin className="w-4 h-4 text-gold" />
+                      <span>Haritada Gezinmek İçin Dokunun</span>
+                    </div>
                   </div>
+                ) : (
+                  <button
+                    onClick={() => setIsMapInteractive(false)}
+                    className="absolute top-3 right-3 z-30 md:hidden px-3 py-1.5 rounded-full bg-slate-900/90 border border-gold/40 text-gold text-[10px] font-bold uppercase tracking-wider shadow-lg hover:bg-gold hover:text-dark-stitch transition-all flex items-center gap-1.5"
+                  >
+                    <span>Haritayı Kilitle</span>
+                  </button>
                 )}
                 
                 {/* Map Overlay for Premium Look */}
@@ -1668,7 +1654,7 @@ export default function App() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative max-w-4xl w-full max-h-[90vh] bg-white/5 backdrop-blur-md rounded-sm overflow-y-auto shadow-[0_0_100px_rgba(212,175,55,0.3)] border border-gold/20 p-12"
+              className="relative max-w-4xl w-full max-h-[90vh] bg-[#0b1329]/95 rounded-sm overflow-y-auto shadow-[0_0_100px_rgba(212,175,55,0.3)] border border-gold/20 p-12"
             >
               <button 
                 onClick={() => setIsBioModalOpen(false)}
@@ -1726,7 +1712,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelectedCert(null)}
-            className="fixed inset-0 z-[600] flex items-center justify-center p-4 md:p-10 bg-black/90 backdrop-blur-sm"
+            className="fixed inset-0 z-[600] flex items-center justify-center p-4 md:p-10 bg-[#050a1a]/95"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -1799,7 +1785,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 h-screen w-screen z-[500] bg-dark-stitch/98 backdrop-blur-2xl overflow-y-auto"
+            className="fixed inset-0 h-screen w-screen z-[500] bg-[#050a1a]/98 overflow-y-auto"
           >
             <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
               <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-navy-stitch/10 rounded-full blur-[120px]" />
@@ -1828,10 +1814,10 @@ export default function App() {
                   {certificates.map((cert, idx) => (
                     <motion.div
                       key={cert.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
+                      initial={isMobile ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                      whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ delay: (idx % 8) * 0.05 }}
+                      transition={isMobile ? { duration: 0 } : { delay: (idx % 8) * 0.05 }}
                       onClick={() => setSelectedCert(cert)}
                       className="group cursor-pointer"
                     >
@@ -1845,7 +1831,7 @@ export default function App() {
                           decoding="async"
                         />
                         <div className="absolute inset-0 bg-dark-stitch/20 group-hover:bg-transparent transition-colors duration-500" />
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 bg-dark-stitch/40 backdrop-blur-[2px]">
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 bg-[#050a1a]/85">
                           <Award className="text-gold w-10 h-10" />
                         </div>
                       </div>
@@ -1871,7 +1857,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 h-screen w-screen z-[500] bg-black/95 backdrop-blur-3xl overflow-y-auto"
+            className="fixed inset-0 h-screen w-screen z-[500] bg-[#050a1a]/98 overflow-y-auto"
           >
             {/* Bokeh Particles Background */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -1960,10 +1946,10 @@ export default function App() {
                     {filteredVideos.map((video, idx) => (
                       <motion.div
                         key={video.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
+                        initial={isMobile ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                        whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: (idx % 6) * 0.1 }}
+                        transition={isMobile ? { duration: 0 } : { delay: (idx % 6) * 0.1 }}
                         onClick={() => setSelectedVideo(video)}
                         className="group cursor-pointer"
                       >
@@ -2006,7 +1992,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelectedVideo(null)}
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-10 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-10 bg-black/90"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -2050,7 +2036,7 @@ export default function App() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-xl bg-white/5 backdrop-blur-md border border-gold/30 rounded-sm p-8 md:p-12 shadow-[0_0_100px_rgba(212,175,55,0.2)]"
+              className="relative w-full max-w-xl bg-[#0b1329]/95 border border-gold/30 rounded-sm p-8 md:p-12 shadow-[0_0_100px_rgba(212,175,55,0.2)]"
             >
               <button 
                 onClick={() => {

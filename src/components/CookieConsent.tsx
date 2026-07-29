@@ -145,7 +145,7 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 280 }}
-          className="max-w-7xl mx-auto pointer-events-auto bg-[#0b0d10]/95 border border-gold/30 rounded-xl sm:rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.85)] text-white backdrop-blur-md overflow-hidden"
+          className="max-w-7xl mx-auto pointer-events-auto bg-[#0b1329]/95 border border-gold/30 rounded-xl sm:rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.85)] text-white overflow-hidden"
         >
           {/* Top Banner Row */}
           <div className="p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">

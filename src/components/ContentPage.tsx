@@ -25,7 +25,7 @@ const FAQAccordion: React.FC<{ question: string; answer: string }> = ({ question
         animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
         className="overflow-hidden"
       >
-        <p className="pb-6 text-white/60 leading-relaxed">{answer}</p>
+        <p className="pb-6 text-slate-300 leading-relaxed font-normal">{answer}</p>
       </motion.div>
     </div>
   );
@@ -95,13 +95,13 @@ export const ContentPage: React.FC<ContentPageProps> = ({ contentKey, onBack }) 
             {/* Definition Section */}
             <section className="relative">
               <div className="flex items-start gap-6">
-                <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0 border border-gold/20">
-                  <Brain className="w-6 h-6 text-gold" />
+                <div className="w-12 h-12 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] text-amber-400">
+                  <Brain className="w-6 h-6 text-amber-400" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-serif text-gold mb-6">Tanım</h2>
                   <div 
-                    className="text-white/70 text-lg leading-relaxed font-light space-y-6"
+                    className="text-slate-200 text-lg leading-relaxed font-normal space-y-6"
                     dangerouslySetInnerHTML={{ __html: content.definition }}
                   />
                 </div>
@@ -111,13 +111,13 @@ export const ContentPage: React.FC<ContentPageProps> = ({ contentKey, onBack }) 
             {/* Mechanism Section */}
             <section className="relative">
               <div className="flex items-start gap-6">
-                <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0 border border-gold/20">
-                  <Microscope className="w-6 h-6 text-gold" />
+                <div className="w-12 h-12 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] text-amber-400">
+                  <Microscope className="w-6 h-6 text-amber-400" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-serif text-gold mb-6">Bilimsel Mekanizma ve Nedenler</h2>
                   <div 
-                    className="text-white/70 text-lg leading-relaxed font-light space-y-6"
+                    className="text-slate-200 text-lg leading-relaxed font-normal space-y-6"
                     dangerouslySetInnerHTML={{ __html: content.mechanism }}
                   />
                 </div>
@@ -127,13 +127,13 @@ export const ContentPage: React.FC<ContentPageProps> = ({ contentKey, onBack }) 
             {/* Clinical Process Section */}
             <section className="relative">
               <div className="flex items-start gap-6">
-                <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0 border border-gold/20">
-                  <UserCheck className="w-6 h-6 text-gold" />
+                <div className="w-12 h-12 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] text-amber-400">
+                  <UserCheck className="w-6 h-6 text-amber-400" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-serif text-gold mb-6">Klinik Süreç ve Tanı Yolculuğu</h2>
                   <div 
-                    className="text-white/70 text-lg leading-relaxed font-light space-y-6"
+                    className="text-slate-200 text-lg leading-relaxed font-normal space-y-6"
                     dangerouslySetInnerHTML={{ __html: content.clinicalProcess }}
                   />
                 </div>
@@ -143,8 +143,8 @@ export const ContentPage: React.FC<ContentPageProps> = ({ contentKey, onBack }) 
             {/* Symptoms Section */}
             <section className="relative">
               <div className="flex items-start gap-6">
-                <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0 border border-gold/20">
-                  <Activity className="w-6 h-6 text-gold" />
+                <div className="w-12 h-12 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] text-amber-400">
+                  <Activity className="w-6 h-6 text-amber-400" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-serif text-gold mb-6">Belirtiler</h2>
@@ -152,7 +152,7 @@ export const ContentPage: React.FC<ContentPageProps> = ({ contentKey, onBack }) 
                     {content.symptoms.map((symptom, idx) => (
                       <li 
                         key={idx} 
-                        className="flex items-start gap-3 text-white/60 bg-white/5 p-6 rounded-sm border border-white/5 leading-relaxed"
+                        className="flex items-start gap-3 text-slate-200 bg-[#0e172e]/90 p-6 rounded-xl border border-amber-500/25 leading-relaxed shadow-md hover:border-amber-400/60 transition-all"
                         dangerouslySetInnerHTML={{ __html: symptom }}
                       />
                     ))}
@@ -164,8 +164,8 @@ export const ContentPage: React.FC<ContentPageProps> = ({ contentKey, onBack }) 
             {/* Diagnosis Section */}
             <section className="relative">
               <div className="flex items-start gap-6">
-                <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0 border border-gold/20">
-                  <ShieldCheck className="w-6 h-6 text-gold" />
+                <div className="w-12 h-12 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] text-amber-400">
+                  <ShieldCheck className="w-6 h-6 text-amber-400" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-serif text-gold mb-6">Tanı Yöntemleri</h2>
@@ -173,7 +173,7 @@ export const ContentPage: React.FC<ContentPageProps> = ({ contentKey, onBack }) 
                     {content.diagnosis.map((method, idx) => (
                       <span 
                         key={idx} 
-                        className="px-6 py-3 bg-gold/5 border border-gold/20 rounded-full text-sm text-gold/80"
+                        className="px-6 py-3 bg-amber-500/10 border border-amber-500/30 rounded-full text-sm text-gold font-medium shadow-[0_0_12px_rgba(245,158,11,0.15)]"
                         dangerouslySetInnerHTML={{ __html: method }}
                       />
                     ))}
@@ -185,16 +185,16 @@ export const ContentPage: React.FC<ContentPageProps> = ({ contentKey, onBack }) 
             {/* Treatment Section */}
             <section className="relative">
               <div className="flex items-start gap-6">
-                <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0 border border-gold/20">
-                  <Stethoscope className="w-6 h-6 text-gold" />
+                <div className="w-12 h-12 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] text-amber-400">
+                  <Stethoscope className="w-6 h-6 text-amber-400" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-serif text-gold mb-6">Tedavi Seçenekleri</h2>
                   <div className="space-y-6">
                     {content.treatments.map((treatment, idx) => (
-                      <div key={idx} className="group p-8 bg-gradient-to-r from-white/5 to-transparent border-l-2 border-gold/30 hover:border-gold transition-all">
+                      <div key={idx} className="group p-8 bg-[#0e172e]/90 rounded-r-xl border-l-4 border-amber-500 border-y border-r border-amber-500/25 hover:border-amber-400 transition-all shadow-md">
                         <p 
-                          className="text-white/80 leading-relaxed text-lg"
+                          className="text-slate-200 leading-relaxed text-lg"
                           dangerouslySetInnerHTML={{ __html: treatment }}
                         />
                       </div>
@@ -207,13 +207,13 @@ export const ContentPage: React.FC<ContentPageProps> = ({ contentKey, onBack }) 
             {/* When to See Doctor Section */}
             <section className="relative">
               <div className="flex items-start gap-6">
-                <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0 border border-gold/20">
-                  <AlertCircle className="w-6 h-6 text-gold" />
+                <div className="w-12 h-12 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] text-amber-400">
+                  <AlertCircle className="w-6 h-6 text-amber-400" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-serif text-gold mb-6">Hangi Durumlarda Doktora Başvurulmalı?</h2>
                   <div 
-                    className="text-white/70 text-lg leading-relaxed font-light p-8 bg-gold/5 border border-gold/10 rounded-sm"
+                    className="text-slate-200 text-lg leading-relaxed font-normal p-8 bg-[#0e172e]/90 border border-amber-500/30 rounded-xl shadow-md"
                     dangerouslySetInnerHTML={{ __html: content.whenToSeeDoctor }}
                   />
                 </div>
@@ -223,13 +223,13 @@ export const ContentPage: React.FC<ContentPageProps> = ({ contentKey, onBack }) 
             {/* Post Treatment Section */}
             <section className="relative">
               <div className="flex items-start gap-6">
-                <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0 border border-gold/20">
-                  <HeartPulse className="w-6 h-6 text-gold" />
+                <div className="w-12 h-12 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] text-amber-400">
+                  <HeartPulse className="w-6 h-6 text-amber-400" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-serif text-gold mb-6">Tedavi Sonrası Süreç</h2>
                   <div 
-                    className="text-white/70 text-lg leading-relaxed font-light"
+                    className="text-slate-200 text-lg leading-relaxed font-normal"
                     dangerouslySetInnerHTML={{ __html: content.postTreatment }}
                   />
                 </div>
@@ -239,13 +239,13 @@ export const ContentPage: React.FC<ContentPageProps> = ({ contentKey, onBack }) 
             {/* Lifestyle Section */}
             <section className="relative">
               <div className="flex items-start gap-6">
-                <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0 border border-gold/20">
-                  <Sparkles className="w-6 h-6 text-gold" />
+                <div className="w-12 h-12 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] text-amber-400">
+                  <Sparkles className="w-6 h-6 text-amber-400" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-serif text-gold mb-6">Yaşam Tarzı Önerileri</h2>
                   <div 
-                    className="text-white/70 text-lg leading-relaxed font-light p-8 bg-white/5 rounded-sm border border-white/5"
+                    className="text-slate-200 text-lg leading-relaxed font-normal p-8 bg-[#0e172e]/90 rounded-xl border border-amber-500/30 shadow-md"
                     dangerouslySetInnerHTML={{ __html: content.lifestyle }}
                   />
                 </div>
@@ -255,12 +255,12 @@ export const ContentPage: React.FC<ContentPageProps> = ({ contentKey, onBack }) 
             {/* FAQ Section */}
             <section className="relative">
               <div className="flex items-start gap-6">
-                <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0 border border-gold/20">
-                  <HelpCircle className="w-6 h-6 text-gold" />
+                <div className="w-12 h-12 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] text-amber-400">
+                  <HelpCircle className="w-6 h-6 text-amber-400" />
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-serif text-gold mb-6">Sıkça Sorulan Sorular</h2>
-                  <div className="bg-white/5 rounded-sm border border-white/5 px-8">
+                  <div className="bg-[#0e172e]/90 rounded-xl border border-amber-500/30 px-8 shadow-md">
                     {content.faq.map((item, idx) => (
                       <FAQAccordion key={idx} question={item.question} answer={item.answer} />
                     ))}

@@ -29,7 +29,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ selectedLegalDoc, onClos
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[500] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md"
+          className="fixed inset-0 z-[500] flex items-center justify-center p-4 sm:p-6 bg-[#050a1a]/95"
           onClick={onClose}
         >
           <motion.div
